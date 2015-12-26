@@ -311,3 +311,35 @@ impl<T: Copy> SliceRing<T> for OptimizedSliceRing<T> {
 // drop `count` elements
 // remove `step_size` values from the front of `ringbuffer`
 // O(1) instead of O(n)
+//
+// impl<T> FixedSliceRing<T> {
+//
+//     /// returns the number of values appended
+//     /// `O(n)` where `n = fill_me.len()`
+//     pub fn push(&mut self, &[T]) -> usize {
+//
+//     }
+//
+//     /// write into `fill_me` the first `fill_me.len()` values
+//     /// present in this ring.
+//     /// `O(n)` where `n = fill_me.len()`
+//     pub fn peak(&self, fill_me: &[T]) -> usize {
+//
+//     }
+//
+//     /// drop (remove) the first `count` values
+//     /// present in this ring.
+//     /// O(1)
+//     pub fn pop(&mut self, count: usize) -> usize
+//
+//     }
+//
+//     pub fn len(&self) {
+//
+//     }
+//
+//     /// 
+//     pub fn space(&self) {
+//
+//     }
+// }
