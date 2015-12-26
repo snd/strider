@@ -232,12 +232,12 @@ impl<T: Copy> SliceRing<T> for OptimizedSliceRing<T> {
     fn push_many_back(&mut self, input: &[T]) {
         // make enough space
         let additional = input.len();
-        let required = self.buf.len() + additional;
-        let cap = self.cap();
-        if cap < required {
+        let required = self.len() + additional;
+        let old_cap = self.cap();
+        if old_cap < required {
             self.buf.reserve(required.next_power_of_two());
             unsafe {
-                self.handle_cap_increase(cap);
+                self.handle_cap_increase(old_cap);
             }
         }
 
