@@ -398,6 +398,8 @@ impl<T: Copy> SliceRing<T> for OptimizedSliceRing<T> {
 macro_rules! test_slice_ring {
     ($new:expr) => {{
         let mut testable = $new;
+        // we use debug_assert_eq! here because it is omitted in
+        // release mode which we want when benchmarking
         debug_assert_eq!(testable.len(), 0);
 
         let mut output: Vec<i32> = std::iter::repeat(0).take(1000).collect();
