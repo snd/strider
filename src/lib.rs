@@ -343,3 +343,53 @@ impl<T: Copy> SliceRing<T> for OptimizedSliceRing<T> {
 //
 //     }
 // }
+// impl<T: Copy> SlidingWindow<T> {
+//     pub fn new(window_size: usize, step_size: usize) -> Self {
+//         assert!(0 < window_size);
+//         assert!(0 < step_size);
+//
+//         SlidingWindow {
+//             window_size: window_size,
+//             step_size: step_size,
+//             // TODO with_capacity
+//             ringbuffer: VecDeque::new(),
+//         }
+//     }
+//
+//     // TODO how fast is this ?
+//     // time complexity
+//     // append `samples`
+//     pub fn len
+//
+//     pub fn is_full(&self) -> bool {
+//         self.window_size <= self.ringbuffer.len()
+//     }
+//
+//     pub fn read_front(&mut self, fill_me: &mut [T]) -> bool {
+//         if !self.can_fill() { return false; }
+//         assert_eq!(fill_me.len(), self.window_size);
+//         for i in 0..self.window_size {
+//             fill_me[i] = self.ringbuffer[i];
+//         }
+//         true
+//     }
+//
+//     pub fn drop_front(&mut self, count: usize) {
+//         for _ in 0..count {
+//             self.buf.pop_front();
+//         }
+//     }
+//
+//     // if `self.can_fill()` fills `window` fully with the next
+//     // `window_size` samples.
+//     // then makes a step discards `self.step_size` samples.
+//     // else does nothing.
+//     // `window.len()` must be equal to `self.window_size`.
+//     // returns whether `self.can_fill()`.
+//     pub fn fill_and_step(&mut self, fill_me: &mut [T]) -> bool {
+//         if !self.fill(fill_me) { return false; }
+//         self.step();
+//         true
+//     }
+// }
+
