@@ -11,12 +11,12 @@ pub trait SliceRing<T> {
     fn read_many_front(&self, output: &mut [T]) -> usize;
 }
 
-impl<T: Copy> SliceRing<T> for VecDeque<T> {
+impl<T: Clone> SliceRing<T> for VecDeque<T> {
     fn push_many_back(&mut self, values: &[T]) {
         for value in values {
             // in most situations this should just be a pointer
             // copy and value copy without any reallocations
-            self.push_back(*value);
+            self.push_back(value.clone());
         }
     }
     fn drop_many_front(&mut self, count: usize) -> usize {
@@ -29,7 +29,7 @@ impl<T: Copy> SliceRing<T> for VecDeque<T> {
     fn read_many_front(&self, output: &mut [T]) -> usize {
         let count = std::cmp::min(self.len(), output.len());
         for i in 0..count {
-            output[i] = self[i];
+            output[i] = self[i].clone();
         }
         count
     }
@@ -226,7 +226,7 @@ impl<T> OptimizedSliceRing<T> {
 
 // TODO test with zero sized types and max length
 
-impl<T: Copy> SliceRing<T> for OptimizedSliceRing<T> {
+impl<T: Clone> SliceRing<T> for OptimizedSliceRing<T> {
     /// increases `self.len()` by `count`.
     fn push_many_back(&mut self, input: &[T]) {
         // make enough space
