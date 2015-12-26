@@ -230,7 +230,7 @@ impl<T: Copy> SliceRing<T> for OptimizedSliceRing<T> {
         let required = self.buf.len() + additional;
         let cap = self.cap();
         if cap < required {
-            self.buf.reserve(required);
+            self.buf.reserve(required.next_power_of_two());
             unsafe {
                 self.handle_cap_increase(cap);
             }
