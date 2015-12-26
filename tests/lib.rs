@@ -8,10 +8,10 @@ macro_rules! test_slice_ring {
     ($new:expr) => {{
         let mut testable = $new;
 
-        let input = (0..10000).collect::<Vec<i32>>();
+        let input = (0..3000).collect::<Vec<i32>>();
         testable.push_many_back(&input[..]);
-        assert_eq!(testable.len(), 10000);
-        assert_eq!(testable.capacity(), 16383);
+        assert_eq!(testable.len(), 3000);
+        assert_eq!(testable.capacity(), 4095);
 
         let mut output: Vec<i32> = std::iter::repeat(0).take(1000).collect();
         assert_eq!(testable.read_many_front(&mut output[..]), 1000);
@@ -22,7 +22,7 @@ macro_rules! test_slice_ring {
         assert_eq!(output, (0..200).collect::<Vec<i32>>());
 
         assert_eq!(testable.drop_many_front(100), 100);
-        assert_eq!(testable.len(), 9900);
+        assert_eq!(testable.len(), 2900);
 
         let mut output: Vec<i32> = std::iter::repeat(0).take(1000).collect();
         assert_eq!(testable.read_many_front(&mut output[..]), 1000);
