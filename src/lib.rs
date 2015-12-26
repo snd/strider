@@ -76,7 +76,6 @@ fn wrap_index(index: usize, size: usize) -> usize {
     index & max_index
 }
 
-// TODO implement only what's needed below
 /// ringbuffer focused on and optimized for operating on slices of values:
 /// appending to the back, reading from the front
 /// and dropping from the front.
