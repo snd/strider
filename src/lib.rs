@@ -3,6 +3,7 @@ use std::usize;
 use std::mem;
 use std::ptr;
 use std::cmp;
+use std::marker::PhantomData;
 
 /// ringbuffer operations on slices
 pub trait SliceRing<T> {
@@ -284,103 +285,107 @@ impl<T: Clone> SliceRing<T> for OptimizedSliceRing<T> {
     }
 }
 
+pub trait HasLength {
+    fn length(&self) -> usize;
+}
+
+impl<T> HasLength for VecDeque<T> {
+    #[inline]
+    fn length(&self) -> usize {
+        self.len()
+    }
+}
+
+impl<T> HasLength for OptimizedSliceRing<T> {
+    #[inline]
+    fn length(&self) -> usize {
+        self.len()
+    }
+}
+
 // /// for safe and convenient ... fixed window and step size
 // /// this is the main thing of this module
 // /// two backing buffer types:
 // /// one simple for illustration
 // /// one optimized for performance
 // /// benchmarked against each other
-// pub struct SlidingWindow<T, Storage: SliceRing<T>> {
-//     pub window_size: usize,
-//     pub step_size: usize,
-//     pub buf: T
-// }
-//
-// impl<T, Storage: SliceRing<T>> SlidingWindow<Storage> {
-//     pub fn from_storage(storage: Storage) {
-//
-//     }
-//     pub fn new_slow(window_size: usize, step_size: usize) {
-//         SlidingWindow {
-//             window_size: window_size,
-//             step_size: step_size,
-//             // TODO initialize based on window and step size
-//             buf: VecDeque::<T>::new()
-//         }
-//     }
-// }
+pub struct SlidingWindow<T, Storage: HasLength + SliceRing<T>> {
+    pub window_size: usize,
+    pub step_size: usize,
+    pub storage: Storage,
+    phantom: PhantomData<T>,
+}
+
+impl<T: Clone, Storage: HasLength + SliceRing<T>> SlidingWindow<T, Storage> {
+    pub fn new_unoptimized(window_size: usize, step_size: usize)
+        -> SlidingWindow<T, VecDeque<T>> {
+        SlidingWindow {
+            window_size: window_size,
+            step_size: step_size,
+            // TODO initialize with capacity based on window and step size
+            storage: VecDeque::<T>::new(),
+            phantom: PhantomData,
+        }
+    }
+    pub fn new(window_size: usize, step_size: usize)
+        -> SlidingWindow<T, OptimizedSliceRing<T>> {
+        SlidingWindow {
+            window_size: window_size,
+            step_size: step_size,
+            // TODO initialize with capacity based on window and step size
+            storage: OptimizedSliceRing::<T>::new(),
+            phantom: PhantomData,
+        }
+    }
+
+    pub fn append(&mut self, input: &[T]) {
+        self.storage.push_many_back(input);
+    }
+
+    pub fn read(&self, output: &mut[T]) {
+        assert_eq!(output.len(), self.window_size);
+        assert!(self.is_readable());
+        self.storage.read_many_front(output);
+    }
+
+    #[inline]
+    pub fn is_readable(&self) -> bool {
+        self.window_size <= self.storage.length()
+    }
+
+    #[inline]
+    pub fn is_steppable(&self) -> bool {
+        self.step_size <= self.storage.length()
+    }
+
+    pub fn step(&mut self) {
+        assert!(self.is_steppable());
+        self.storage.drop_many_front(self.step_size);
+    }
+
+    pub fn read_and_step(&mut self, output: &mut[T]) {
+        assert_eq!(output.len(), self.window_size);
+        assert!(self.is_readable());
+        assert!(self.is_steppable());
+        self.storage.read_many_front(output);
+        self.storage.drop_many_front(self.step_size);
+    }
+}
 //
 // drop `count` elements
 // remove `step_size` values from the front of `ringbuffer`
 // O(1) instead of O(n)
 //
-// impl<T> FixedSliceRing<T> {
-//
 //     /// returns the number of values appended
 //     /// `O(n)` where `n = fill_me.len()`
-//     pub fn push(&mut self, &[T]) -> usize {
-//
-//     }
 //
 //     /// write into `fill_me` the first `fill_me.len()` values
 //     /// present in this ring.
 //     /// `O(n)` where `n = fill_me.len()`
-//     pub fn peak(&self, fill_me: &[T]) -> usize {
-//
-//     }
 //
 //     /// drop (remove) the first `count` values
 //     /// present in this ring.
 //     /// O(1)
-//     pub fn pop(&mut self, count: usize) -> usize
-//
-//     }
-//
-//     pub fn len(&self) {
-//
-//     }
-//
-//     /// 
-//     pub fn space(&self) {
-//
-//     }
-// }
-// impl<T: Copy> SlidingWindow<T> {
-//     pub fn new(window_size: usize, step_size: usize) -> Self {
-//         assert!(0 < window_size);
-//         assert!(0 < step_size);
-//
-//         SlidingWindow {
-//             window_size: window_size,
-//             step_size: step_size,
-//             // TODO with_capacity
-//             ringbuffer: VecDeque::new(),
-//         }
-//     }
-//
-//     // TODO how fast is this ?
-//     // time complexity
-//     // append `samples`
-//     pub fn len
-//
-//     pub fn is_full(&self) -> bool {
-//         self.window_size <= self.ringbuffer.len()
-//     }
-//
-//     pub fn read_front(&mut self, fill_me: &mut [T]) -> bool {
-//         if !self.can_fill() { return false; }
-//         assert_eq!(fill_me.len(), self.window_size);
-//         for i in 0..self.window_size {
-//             fill_me[i] = self.ringbuffer[i];
-//         }
-//         true
-//     }
-//
-//     pub fn drop_front(&mut self, count: usize) {
-//         for _ in 0..count {
-//             self.buf.pop_front();
-//         }
-//     }
 //
 //     // if `self.can_fill()` fills `window` fully with the next
 //     // `window_size` samples.
@@ -388,12 +393,6 @@ impl<T: Clone> SliceRing<T> for OptimizedSliceRing<T> {
 //     // else does nothing.
 //     // `window.len()` must be equal to `self.window_size`.
 //     // returns whether `self.can_fill()`.
-//     pub fn fill_and_step(&mut self, fill_me: &mut [T]) -> bool {
-//         if !self.fill(fill_me) { return false; }
-//         self.step();
-//         true
-//     }
-// }
 
 /// macro containing a test run that is used to test and benchmark
 /// different implementations of the `SliceRing` trait
