@@ -182,6 +182,7 @@ impl<T> OptimizedSliceRing<T> {
         // after handle_cap_increase:
         //        R             W
         // [. . . o o o o o c c . . . . . . ]
+        // TODO test this
         if self.next_writable < old_cap - self.first_readable {
             let next_writable = self.next_writable;
             let copy_src = 0;
@@ -198,6 +199,7 @@ impl<T> OptimizedSliceRing<T> {
             return
         }
 
+        // TODO test this
         // shortest section at tail:
         // before cap increase:
         //            W R
@@ -453,6 +455,7 @@ macro_rules! test_slice_ring {
         //
         // TODO drop more than contained
         //
-        // TODO little window run
     }};
 }
+
+// TODO little window run test and benchmark
