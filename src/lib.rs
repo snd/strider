@@ -446,10 +446,15 @@ macro_rules! test_slice_ring {
         debug_assert_eq!(testable.len(), 3395);
         debug_assert_eq!(testable.capacity(), 4095);
 
-        let input = (5000..7000).collect::<Vec<i32>>();
+        let input = (4000..6000).collect::<Vec<i32>>();
         testable.push_many_back(&input[..]);
         debug_assert_eq!(testable.len(), 5395);
         debug_assert_eq!(testable.capacity(), 8191);
+
+        let mut output: Vec<i32> = std::iter::repeat(0).take(6000).collect();
+        debug_assert_eq!(testable.read_many_front(&mut output[..]), 5395);
+        debug_assert_eq!(
+            output, (605..6000).chain(std::iter::repeat(0).take(605)).collect::<Vec<i32>>());
 
         // TODO push more
         //
