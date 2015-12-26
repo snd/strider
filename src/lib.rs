@@ -484,4 +484,9 @@ macro_rules! test_slice_ring {
     }};
 }
 
-// TODO little window run test and benchmark
+#[macro_export]
+macro_rules! test_sliding_window {
+    ($new:expr) => {{
+        let mut testable = $new;
+    }};
+}

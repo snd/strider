@@ -7,6 +7,7 @@ use std::collections::VecDeque;
 extern crate sliding_window;
 use sliding_window::SliceRing;
 use sliding_window::OptimizedSliceRing;
+use sliding_window::SlidingWindow;
 
 #[bench]
 fn bench_empty_to_probe_for_release_mode(b: &mut test::Bencher) {
@@ -82,5 +83,22 @@ fn bench_test_slice_ring_unoptimized(b: &mut test::Bencher) {
 fn bench_test_slice_ring_optimized(b: &mut test::Bencher) {
     b.iter(|| {
         test_slice_ring!(OptimizedSliceRing::<i32>::new())
+    });
+}
+
+#[bench]
+fn bench_test_sliding_window_unoptimized(b: &mut test::Bencher) {
+    b.iter(|| {
+    // TODO this type declaration is soo ugly
+        test_sliding_window!(SlidingWindow::<i32, VecDeque<i32>>::new_unoptimized(
+            4096, 512));
+    });
+}
+#[bench]
+fn bench_test_sliding_window_optimized(b: &mut test::Bencher) {
+    b.iter(|| {
+        // TODO this type declaration is soo ugly
+        test_sliding_window!(SlidingWindow::<i32, OptimizedSliceRing<i32>>::new(
+            4096, 512));
     });
 }
