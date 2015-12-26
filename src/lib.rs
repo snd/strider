@@ -437,6 +437,16 @@ macro_rules! test_slice_ring {
         debug_assert_eq!(
             output, (605..3000).chain(std::iter::repeat(0).take(1605)).collect::<Vec<i32>>());
 
+        let input = (3000..4000).collect::<Vec<i32>>();
+        testable.push_many_back(&input[..]);
+        debug_assert_eq!(testable.len(), 3395);
+        debug_assert_eq!(testable.capacity(), 4095);
+
+        let input = (5000..7000).collect::<Vec<i32>>();
+        testable.push_many_back(&input[..]);
+        debug_assert_eq!(testable.len(), 5395);
+        debug_assert_eq!(testable.capacity(), 8191);
+
         // TODO push more
         //
         // TODO drop more than contained
