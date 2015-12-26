@@ -9,7 +9,6 @@ use sliding_window::OptimizedSliceRing;
 fn test_slice_ring_unoptimized() {
     test_slice_ring!(VecDeque::<i32>::new());
 }
-
 #[test]
 fn test_slice_ring_optimized() {
     test_slice_ring!(OptimizedSliceRing::<i32>::new());
