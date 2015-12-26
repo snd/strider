@@ -168,7 +168,9 @@ impl<T> OptimizedSliceRing<T> {
         // after handle_cap_increase:
         //  R             W
         // [o o o o o o o . . . . . . . . . ]
-        if self.is_continuous() { return }
+        if self.is_continuous() {
+            return
+        }
 
         // shortest section at front:
         // before cap increase:
