@@ -392,10 +392,20 @@ impl<T: Copy> SliceRing<T> for OptimizedSliceRing<T> {
 //     }
 // }
 
+/// macro containing a test run that is used to test and benchmark
+/// different implementations of the `SliceRing` trait
 #[macro_export]
 macro_rules! test_slice_ring {
     ($new:expr) => {{
         let mut testable = $new;
+        debug_assert_eq!(testable.len(), 0);
+
+        let mut output: Vec<i32> = std::iter::repeat(0).take(1000).collect();
+        debug_assert_eq!(testable.read_many_front(&mut output[..]), 0);
+        debug_assert_eq!(output, std::iter::repeat(0).take(1000).collect::<Vec<i32>>());
+
+        debug_assert_eq!(testable.drop_many_front(505), 0);
+        debug_assert_eq!(testable.len(), 0);
 
         let input = (0..3000).collect::<Vec<i32>>();
         testable.push_many_back(&input[..]);
@@ -424,5 +434,11 @@ macro_rules! test_slice_ring {
         debug_assert_eq!(testable.read_many_front(&mut output[..]), 2395);
         debug_assert_eq!(
             output, (605..3000).chain(std::iter::repeat(0).take(1605)).collect::<Vec<i32>>());
+
+        // TODO push more
+        //
+        // TODO drop more than contained
+        //
+        // TODO little window run
     }};
 }
