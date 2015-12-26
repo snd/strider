@@ -1,34 +1,9 @@
 use std::collections::VecDeque;
 
+#[macro_use]
 extern crate sliding_window;
 use sliding_window::SliceRing;
 use sliding_window::OptimizedSliceRing;
-
-macro_rules! test_slice_ring {
-    ($new:expr) => {{
-        let mut testable = $new;
-
-        let input = (0..3000).collect::<Vec<i32>>();
-        testable.push_many_back(&input[..]);
-        assert_eq!(testable.len(), 3000);
-        assert_eq!(testable.capacity(), 4095);
-
-        let mut output: Vec<i32> = std::iter::repeat(0).take(1000).collect();
-        assert_eq!(testable.read_many_front(&mut output[..]), 1000);
-        assert_eq!(output, (0..1000).collect::<Vec<i32>>());
-
-        let mut output: Vec<i32> = std::iter::repeat(0).take(200).collect();
-        assert_eq!(testable.read_many_front(&mut output[..]), 200);
-        assert_eq!(output, (0..200).collect::<Vec<i32>>());
-
-        assert_eq!(testable.drop_many_front(100), 100);
-        assert_eq!(testable.len(), 2900);
-
-        let mut output: Vec<i32> = std::iter::repeat(0).take(1000).collect();
-        assert_eq!(testable.read_many_front(&mut output[..]), 1000);
-        assert_eq!(output, (100..1100).collect::<Vec<i32>>());
-    }};
-}
 
 #[test]
 fn test_deque_slice_ring() {
