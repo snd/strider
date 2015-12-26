@@ -441,11 +441,13 @@ macro_rules! test_slice_ring {
         debug_assert_eq!(
             output, (605..3000).chain(std::iter::repeat(0).take(1605)).collect::<Vec<i32>>());
 
+        // push without cap increase
         let input = (3000..4000).collect::<Vec<i32>>();
         testable.push_many_back(&input[..]);
         debug_assert_eq!(testable.len(), 3395);
         debug_assert_eq!(testable.capacity(), 4095);
 
+        // push with cap increase
         let input = (4000..6000).collect::<Vec<i32>>();
         testable.push_many_back(&input[..]);
         debug_assert_eq!(testable.len(), 5395);
@@ -456,10 +458,31 @@ macro_rules! test_slice_ring {
         debug_assert_eq!(
             output, (605..6000).chain(std::iter::repeat(0).take(605)).collect::<Vec<i32>>());
 
-        // TODO push more
-        //
-        // TODO drop more than contained
-        //
+        debug_assert_eq!(testable.drop_many_front(395), 395);
+        debug_assert_eq!(testable.len(), 5000);
+
+        let mut output: Vec<i32> = std::iter::repeat(0).take(5000).collect();
+        debug_assert_eq!(testable.read_many_front(&mut output[..]), 5000);
+        debug_assert_eq!(
+            output, (1000..6000).collect::<Vec<i32>>());
+
+        debug_assert_eq!(testable.drop_many_front(4000), 4000);
+        debug_assert_eq!(testable.len(), 1000);
+
+        let mut output: Vec<i32> = std::iter::repeat(0).take(2000).collect();
+        debug_assert_eq!(testable.read_many_front(&mut output[..]), 1000);
+        debug_assert_eq!(
+            output, (5000..6000).chain(std::iter::repeat(0).take(1000)).collect::<Vec<i32>>());
+
+        // drop more than contained
+        debug_assert_eq!(testable.drop_many_front(1500), 1000);
+        debug_assert_eq!(testable.len(), 0);
+        debug_assert_eq!(testable.capacity(), 8191);
+
+        let mut output: Vec<i32> = std::iter::repeat(0).take(2000).collect();
+        debug_assert_eq!(testable.read_many_front(&mut output[..]), 0);
+        debug_assert_eq!(
+            output, std::iter::repeat(0).take(2000).collect::<Vec<i32>>());
     }};
 }
 
