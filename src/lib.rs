@@ -42,6 +42,7 @@ const MAXIMUM_ZST_CAPACITY: usize = usize::MAX;
 // readable area starts at first_readable and goes until (not including)
 // next_writable is one after the last readable
 
+// TODO move this into its own file
 // R = first_readable
 // W = next_writable
 // o = occupied (len)
@@ -254,7 +255,6 @@ impl<T: Copy> SliceRing<T> for OptimizedSliceRing<T> {
         self.next_writable = self.wrap_add(self.next_writable, additional);
     }
 
-    // DONE !!!
     /// reduces `self.len()` by `count`.
     fn drop_many_front(&mut self, count: usize) -> usize {
         // TODO improve name of real_count
@@ -264,7 +264,6 @@ impl<T: Copy> SliceRing<T> for OptimizedSliceRing<T> {
         real_count
     }
 
-    // DONE !!!
     fn read_many_front(&self, output: &mut [T]) -> usize {
         let real_count = std::cmp::min(self.len(), output.len());
         for i in 0..real_count {
