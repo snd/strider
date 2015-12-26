@@ -1,6 +1,7 @@
 #![feature(test)]
 extern crate test;
 
+#[macro_use]
 extern crate sliding_window;
 use sliding_window::SliceRing;
 use sliding_window::OptimizedSliceRing;
@@ -33,5 +34,12 @@ fn bench_optimized_read_many_front(b: &mut test::Bencher) {
     deque.push_many_back(&vec[..]);
     b.iter(|| {
         deque.read_many_front(&mut output[..])
+    });
+}
+
+#[bench]
+fn bench_optimized_test_slice_ring(b: &mut test::Bencher) {
+    b.iter(|| {
+        test_slice_ring!(OptimizedSliceRing::<i32>::new())
     });
 }
