@@ -484,9 +484,20 @@ macro_rules! test_slice_ring {
     }};
 }
 
+// TODO separate bench and tests. this should just be the bench
 #[macro_export]
 macro_rules! test_sliding_window {
     ($new:expr) => {{
         let mut testable = $new;
+        let input: Vec<i32> = std::iter::repeat(0).take(6000).collect();
+        let mut output: Vec<i32> = std::iter::repeat(0).take(4096).collect();
+        for _ in 0..100 {
+            testable.append(&input[..]);
+            // TODO we almost need a is_readable_and_steppable
+            while testable.is_readable() {
+                testable.read_and_step(&mut output[..]);
+            }
+        }
+        testable
     }};
 }
