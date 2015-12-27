@@ -25,15 +25,23 @@ macro_rules! bench_push_many_back {
     }}
 }
 #[bench]
-fn bench_push_many_back_unoptimized(b: &mut test::Bencher) {
+fn bench_push_many_back_deque(b: &mut test::Bencher) {
     bench_push_many_back!(b, VecDeque::new());
+}
+#[bench]
+fn bench_push_many_back_deque_with_capacity(b: &mut test::Bencher) {
+    bench_push_many_back!(b, VecDeque::with_capacity(1000));
 }
 #[bench]
 fn bench_push_many_back_optimized(b: &mut test::Bencher) {
     bench_push_many_back!(b, OptimizedSliceRing::new());
 }
+#[bench]
+fn bench_push_many_back_optimized_with_capacity(b: &mut test::Bencher) {
+    bench_push_many_back!(b, OptimizedSliceRing::with_capacity(1000));
+}
 
-macro_rules! bench_push_many_back_drop_many_front {
+macro_rules! bench_drop_many_front {
     ($bencher:expr, $new:expr) => {{
         let vec = (0..1000).collect::<Vec<i32>>();
         $bencher.iter(|| {
@@ -45,12 +53,20 @@ macro_rules! bench_push_many_back_drop_many_front {
 }
 
 #[bench]
-fn bench_push_many_back_drop_many_front_unoptimized(b: &mut test::Bencher) {
-    bench_push_many_back!(b, VecDeque::new());
+fn bench_drop_many_front_deque(b: &mut test::Bencher) {
+    bench_drop_many_front!(b, VecDeque::new());
 }
 #[bench]
-fn bench_push_many_back_drop_many_front_optimized(b: &mut test::Bencher) {
-    bench_push_many_back!(b, OptimizedSliceRing::new());
+fn bench_drop_many_front_deque_with_capacity(b: &mut test::Bencher) {
+    bench_drop_many_front!(b, VecDeque::with_capacity(1000));
+}
+#[bench]
+fn bench_drop_many_front_optimized(b: &mut test::Bencher) {
+    bench_drop_many_front!(b, OptimizedSliceRing::new());
+}
+#[bench]
+fn bench_drop_many_front_optimized_with_capacity(b: &mut test::Bencher) {
+    bench_drop_many_front!(b, OptimizedSliceRing::with_capacity(1000));
 }
 
 macro_rules! bench_read_many_front {
@@ -65,16 +81,24 @@ macro_rules! bench_read_many_front {
     }}
 }
 #[bench]
-fn bench_read_many_front_unoptimized(b: &mut test::Bencher) {
+fn bench_read_many_front_deque(b: &mut test::Bencher) {
     bench_read_many_front!(b, VecDeque::new());
+}
+#[bench]
+fn bench_read_many_front_deque_with_capacity(b: &mut test::Bencher) {
+    bench_read_many_front!(b, VecDeque::with_capacity(1000));
 }
 #[bench]
 fn bench_read_many_front_optimized(b: &mut test::Bencher) {
     bench_read_many_front!(b, OptimizedSliceRing::new());
 }
+#[bench]
+fn bench_read_many_front_optimized_with_capacity(b: &mut test::Bencher) {
+    bench_read_many_front!(b, OptimizedSliceRing::with_capacity(1000));
+}
 
 #[bench]
-fn bench_test_slice_ring_unoptimized(b: &mut test::Bencher) {
+fn bench_test_slice_ring_deque(b: &mut test::Bencher) {
     b.iter(|| {
         test_slice_ring!(VecDeque::<i32>::new());
     });
@@ -85,9 +109,39 @@ fn bench_test_slice_ring_optimized(b: &mut test::Bencher) {
         test_slice_ring!(OptimizedSliceRing::<i32>::new())
     });
 }
+#[macro_export]
+macro_rules! bench_slice_ring_windowing {
+    ($new:expr) => {{
+        let window_size = 4096;
+        let step_size = 512;
+        let mut testable = $new;
+        let input: Vec<i32> = std::iter::repeat(0).take(6000).collect();
+        let mut output: Vec<i32> = std::iter::repeat(0).take(window_size).collect();
+        for _ in 0..100 {
+            testable.push_many_back(&input[..]);
+            while testable.len() >= window_size {
+                testable.read_many_front(&mut output[..]);
+                testable.drop_many_front(step_size);
+            }
+        }
+        testable
+    }};
+}
+#[bench]
+fn bench_slice_ring_windowing_deque(b: &mut test::Bencher) {
+    b.iter(|| {
+        bench_slice_ring_windowing!(VecDeque::<i32>::new());
+    });
+}
+#[bench]
+fn bench_slice_ring_windowing_optimized(b: &mut test::Bencher) {
+    b.iter(|| {
+        bench_slice_ring_windowing!(OptimizedSliceRing::<i32>::new())
+    });
+}
 
 #[bench]
-fn bench_test_sliding_window_unoptimized(b: &mut test::Bencher) {
+fn bench_test_sliding_window_deque(b: &mut test::Bencher) {
     b.iter(|| {
     // TODO this type declaration is soo ugly
         test_sliding_window!(SlidingWindow::<i32, VecDeque<i32>>::new_unoptimized(
