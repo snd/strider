@@ -3,7 +3,6 @@ use std::usize;
 use std::mem;
 use std::ptr;
 use std::cmp;
-use std::marker::PhantomData;
 
 /// ringbuffer operations on slices
 pub trait SliceRing<T> {
@@ -285,92 +284,12 @@ impl<T: Clone> SliceRing<T> for OptimizedSliceRing<T> {
     }
 }
 
-pub trait HasLength {
-    fn length(&self) -> usize;
-}
-
-impl<T> HasLength for VecDeque<T> {
-    #[inline]
-    fn length(&self) -> usize {
-        self.len()
-    }
-}
-
-impl<T> HasLength for OptimizedSliceRing<T> {
-    #[inline]
-    fn length(&self) -> usize {
-        self.len()
-    }
-}
-
 // /// for safe and convenient ... fixed window and step size
 // /// this is the main thing of this module
 // /// two backing buffer types:
 // /// one simple for illustration
 // /// one optimized for performance
 // /// benchmarked against each other
-pub struct SlidingWindow<T, Storage: HasLength + SliceRing<T>> {
-    pub window_size: usize,
-    pub step_size: usize,
-    pub storage: Storage,
-    phantom: PhantomData<T>,
-}
-
-impl<T: Clone, Storage: HasLength + SliceRing<T>> SlidingWindow<T, Storage> {
-    pub fn new_unoptimized(window_size: usize, step_size: usize)
-        -> SlidingWindow<T, VecDeque<T>> {
-        SlidingWindow {
-            window_size: window_size,
-            step_size: step_size,
-            // TODO initialize with capacity based on window and step size
-            storage: VecDeque::<T>::new(),
-            phantom: PhantomData,
-        }
-    }
-    pub fn new(window_size: usize, step_size: usize)
-        -> SlidingWindow<T, OptimizedSliceRing<T>> {
-        SlidingWindow {
-            window_size: window_size,
-            step_size: step_size,
-            // TODO initialize with capacity based on window and step size
-            storage: OptimizedSliceRing::<T>::new(),
-            phantom: PhantomData,
-        }
-    }
-
-    pub fn append(&mut self, input: &[T]) {
-        self.storage.push_many_back(input);
-    }
-
-    pub fn read(&self, output: &mut[T]) {
-        assert_eq!(output.len(), self.window_size);
-        assert!(self.is_readable());
-        self.storage.read_many_front(output);
-    }
-
-    #[inline]
-    pub fn is_readable(&self) -> bool {
-        self.window_size <= self.storage.length()
-    }
-
-    #[inline]
-    pub fn is_steppable(&self) -> bool {
-        self.step_size <= self.storage.length()
-    }
-
-    pub fn step(&mut self) {
-        assert!(self.is_steppable());
-        self.storage.drop_many_front(self.step_size);
-    }
-
-    pub fn read_and_step(&mut self, output: &mut[T]) {
-        assert_eq!(output.len(), self.window_size);
-        assert!(self.is_readable());
-        assert!(self.is_steppable());
-        self.storage.read_many_front(output);
-        self.storage.drop_many_front(self.step_size);
-    }
-}
 //
 // drop `count` elements
 // remove `step_size` values from the front of `ringbuffer`
@@ -491,23 +410,5 @@ macro_rules! test_slice_ring {
         debug_assert_eq!(testable.read_many_front(&mut output[..]), 0);
         debug_assert_eq!(
             output, std::iter::repeat(0).take(2000).collect::<Vec<i32>>());
-    }};
-}
-
-// TODO separate bench and tests. this should just be the bench
-#[macro_export]
-macro_rules! test_sliding_window {
-    ($new:expr) => {{
-        let mut testable = $new;
-        let input: Vec<i32> = std::iter::repeat(0).take(6000).collect();
-        let mut output: Vec<i32> = std::iter::repeat(0).take(4096).collect();
-        for _ in 0..100 {
-            testable.append(&input[..]);
-            // TODO we almost need a is_readable_and_steppable
-            while testable.is_readable() {
-                testable.read_and_step(&mut output[..]);
-            }
-        }
-        testable
     }};
 }
