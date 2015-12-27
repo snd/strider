@@ -6,19 +6,29 @@ use std::cmp;
 
 /// ringbuffer operations on slices
 pub trait SliceRing<T> {
+    /// appends `values` to the back.
     fn push_many_back(&mut self, values: &[T]);
+    /// removes `count` elements from the front of this ring.
+    /// returns how many elements were removed.
     fn drop_many_front(&mut self, count: usize) -> usize;
+    /// copies the first `output.len()` elements present in this ring
+    /// into `output`.
+    /// returns how many elements were copied.
+    /// returns less than `output.len()` if there are less elements present
+    /// in this ring.
     fn read_many_front(&self, output: &mut [T]) -> usize;
 }
 
 impl<T: Clone> SliceRing<T> for VecDeque<T> {
-    fn push_many_back(&mut self, values: &[T]) {
-        for value in values {
+    // `O(input.len())`
+    fn push_many_back(&mut self, input: &[T]) {
+        for value in input {
             // in most situations this should just be a pointer
             // copy and value copy without any reallocations
             self.push_back(value.clone());
         }
     }
+    // `O(count)`
     fn drop_many_front(&mut self, count: usize) -> usize {
         let real_count = std::cmp::min(self.len(), count);
         for _ in 0..real_count {
@@ -26,6 +36,7 @@ impl<T: Clone> SliceRing<T> for VecDeque<T> {
         }
         real_count
     }
+    // `O(min(self.len(), output.len()))`
     fn read_many_front(&self, output: &mut [T]) -> usize {
         let count = std::cmp::min(self.len(), output.len());
         for i in 0..count {
@@ -227,7 +238,7 @@ impl<T> SliceRingImpl<T> {
 // TODO test with zero sized types and max length
 
 impl<T: Clone> SliceRing<T> for SliceRingImpl<T> {
-    /// increases `self.len()` by `count`.
+    // `O(input.len())`
     fn push_many_back(&mut self, input: &[T]) {
         // make enough space
         let additional = input.len();
@@ -258,7 +269,7 @@ impl<T: Clone> SliceRing<T> for SliceRingImpl<T> {
         self.next_writable = self.wrap_add(self.next_writable, additional);
     }
 
-    /// reduces `self.len()` by `count`.
+    // `O(1)`
     fn drop_many_front(&mut self, count: usize) -> usize {
         // TODO improve name of real_count
         let real_count = std::cmp::min(self.len(), count);
@@ -267,6 +278,7 @@ impl<T: Clone> SliceRing<T> for SliceRingImpl<T> {
         real_count
     }
 
+    // `O(min(self.len(), output.len()))`
     fn read_many_front(&self, output: &mut [T]) -> usize {
         let real_count = std::cmp::min(self.len(), output.len());
         for i in 0..real_count {
@@ -283,35 +295,6 @@ impl<T: Clone> SliceRing<T> for SliceRingImpl<T> {
         real_count
     }
 }
-
-// /// for safe and convenient ... fixed window and step size
-// /// this is the main thing of this module
-// /// two backing buffer types:
-// /// one simple for illustration
-// /// one optimized for performance
-// /// benchmarked against each other
-//
-// drop `count` elements
-// remove `step_size` values from the front of `ringbuffer`
-// O(1) instead of O(n)
-//
-//     /// returns the number of values appended
-//     /// `O(n)` where `n = fill_me.len()`
-//
-//     /// write into `fill_me` the first `fill_me.len()` values
-//     /// present in this ring.
-//     /// `O(n)` where `n = fill_me.len()`
-//
-//     /// drop (remove) the first `count` values
-//     /// present in this ring.
-//     /// O(1)
-//
-//     // if `self.can_fill()` fills `window` fully with the next
-//     // `window_size` samples.
-//     // then makes a step discards `self.step_size` samples.
-//     // else does nothing.
-//     // `window.len()` must be equal to `self.window_size`.
-//     // returns whether `self.can_fill()`.
 
 /// macro containing a test run that is used to test and benchmark
 /// different implementations of the `SliceRing` trait
