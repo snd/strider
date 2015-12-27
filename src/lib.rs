@@ -404,13 +404,16 @@ macro_rules! test_slice_ring {
         // release mode which we want when benchmarking
         debug_assert_eq!(testable.len(), 0);
 
+        // read nothing
         let mut output: Vec<i32> = std::iter::repeat(0).take(1000).collect();
         debug_assert_eq!(testable.read_many_front(&mut output[..]), 0);
         debug_assert_eq!(output, std::iter::repeat(0).take(1000).collect::<Vec<i32>>());
 
+        // drop nothing
         debug_assert_eq!(testable.drop_many_front(505), 0);
         debug_assert_eq!(testable.len(), 0);
 
+        // first push. forces cap increase
         let input = (0..3000).collect::<Vec<i32>>();
         testable.push_many_back(&input[..]);
         debug_assert_eq!(testable.len(), 3000);
@@ -420,6 +423,7 @@ macro_rules! test_slice_ring {
         debug_assert_eq!(testable.read_many_front(&mut output[..]), 1000);
         debug_assert_eq!(output, (0..1000).collect::<Vec<i32>>());
 
+        // repeated read
         let mut output: Vec<i32> = std::iter::repeat(0).take(200).collect();
         debug_assert_eq!(testable.read_many_front(&mut output[..]), 200);
         debug_assert_eq!(output, (0..200).collect::<Vec<i32>>());
@@ -427,6 +431,7 @@ macro_rules! test_slice_ring {
         debug_assert_eq!(testable.drop_many_front(100), 100);
         debug_assert_eq!(testable.len(), 2900);
 
+        // test effect of drop
         let mut output: Vec<i32> = std::iter::repeat(0).take(1000).collect();
         debug_assert_eq!(testable.read_many_front(&mut output[..]), 1000);
         debug_assert_eq!(output, (100..1100).collect::<Vec<i32>>());
@@ -434,6 +439,7 @@ macro_rules! test_slice_ring {
         debug_assert_eq!(testable.drop_many_front(505), 505);
         debug_assert_eq!(testable.len(), 2395);
 
+        // test effect of drop. overread
         let mut output: Vec<i32> = std::iter::repeat(0).take(4000).collect();
         debug_assert_eq!(testable.read_many_front(&mut output[..]), 2395);
         debug_assert_eq!(
@@ -445,12 +451,13 @@ macro_rules! test_slice_ring {
         debug_assert_eq!(testable.len(), 3395);
         debug_assert_eq!(testable.capacity(), 4095);
 
-        // push with cap increase
+        // push that forces cap increase
         let input = (4000..6000).collect::<Vec<i32>>();
         testable.push_many_back(&input[..]);
         debug_assert_eq!(testable.len(), 5395);
         debug_assert_eq!(testable.capacity(), 8191);
 
+        // overread
         let mut output: Vec<i32> = std::iter::repeat(0).take(6000).collect();
         debug_assert_eq!(testable.read_many_front(&mut output[..]), 5395);
         debug_assert_eq!(
@@ -459,6 +466,7 @@ macro_rules! test_slice_ring {
         debug_assert_eq!(testable.drop_many_front(395), 395);
         debug_assert_eq!(testable.len(), 5000);
 
+        // test effect of drop
         let mut output: Vec<i32> = std::iter::repeat(0).take(5000).collect();
         debug_assert_eq!(testable.read_many_front(&mut output[..]), 5000);
         debug_assert_eq!(
@@ -467,6 +475,7 @@ macro_rules! test_slice_ring {
         debug_assert_eq!(testable.drop_many_front(4000), 4000);
         debug_assert_eq!(testable.len(), 1000);
 
+        // test effect of drop. overread
         let mut output: Vec<i32> = std::iter::repeat(0).take(2000).collect();
         debug_assert_eq!(testable.read_many_front(&mut output[..]), 1000);
         debug_assert_eq!(
@@ -477,6 +486,7 @@ macro_rules! test_slice_ring {
         debug_assert_eq!(testable.len(), 0);
         debug_assert_eq!(testable.capacity(), 8191);
 
+        // read nothing
         let mut output: Vec<i32> = std::iter::repeat(0).take(2000).collect();
         debug_assert_eq!(testable.read_many_front(&mut output[..]), 0);
         debug_assert_eq!(
