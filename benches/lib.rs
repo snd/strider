@@ -6,7 +6,7 @@ use std::collections::VecDeque;
 #[macro_use]
 extern crate sliding_window;
 use sliding_window::SliceRing;
-use sliding_window::OptimizedSliceRing;
+use sliding_window::SliceRingImpl;
 
 #[bench]
 fn bench_empty_to_probe_for_release_mode(b: &mut test::Bencher) {
@@ -33,11 +33,11 @@ fn bench_push_many_back_deque_with_capacity(b: &mut test::Bencher) {
 }
 #[bench]
 fn bench_push_many_back_optimized(b: &mut test::Bencher) {
-    bench_push_many_back!(b, OptimizedSliceRing::new());
+    bench_push_many_back!(b, SliceRingImpl::new());
 }
 #[bench]
 fn bench_push_many_back_optimized_with_capacity(b: &mut test::Bencher) {
-    bench_push_many_back!(b, OptimizedSliceRing::with_capacity(1000));
+    bench_push_many_back!(b, SliceRingImpl::with_capacity(1000));
 }
 
 macro_rules! bench_drop_many_front {
@@ -61,11 +61,11 @@ fn bench_drop_many_front_deque_with_capacity(b: &mut test::Bencher) {
 }
 #[bench]
 fn bench_drop_many_front_optimized(b: &mut test::Bencher) {
-    bench_drop_many_front!(b, OptimizedSliceRing::new());
+    bench_drop_many_front!(b, SliceRingImpl::new());
 }
 #[bench]
 fn bench_drop_many_front_optimized_with_capacity(b: &mut test::Bencher) {
-    bench_drop_many_front!(b, OptimizedSliceRing::with_capacity(1000));
+    bench_drop_many_front!(b, SliceRingImpl::with_capacity(1000));
 }
 
 macro_rules! bench_read_many_front {
@@ -89,11 +89,11 @@ fn bench_read_many_front_deque_with_capacity(b: &mut test::Bencher) {
 }
 #[bench]
 fn bench_read_many_front_optimized(b: &mut test::Bencher) {
-    bench_read_many_front!(b, OptimizedSliceRing::new());
+    bench_read_many_front!(b, SliceRingImpl::new());
 }
 #[bench]
 fn bench_read_many_front_optimized_with_capacity(b: &mut test::Bencher) {
-    bench_read_many_front!(b, OptimizedSliceRing::with_capacity(1000));
+    bench_read_many_front!(b, SliceRingImpl::with_capacity(1000));
 }
 
 #[bench]
@@ -105,7 +105,7 @@ fn bench_test_slice_ring_deque(b: &mut test::Bencher) {
 #[bench]
 fn bench_test_slice_ring_optimized(b: &mut test::Bencher) {
     b.iter(|| {
-        test_slice_ring!(OptimizedSliceRing::<i32>::new())
+        test_slice_ring!(SliceRingImpl::<i32>::new())
     });
 }
 #[macro_export]
@@ -135,6 +135,6 @@ fn bench_slice_ring_windowing_deque(b: &mut test::Bencher) {
 #[bench]
 fn bench_slice_ring_windowing_optimized(b: &mut test::Bencher) {
     b.iter(|| {
-        bench_slice_ring_windowing!(OptimizedSliceRing::<i32>::new())
+        bench_slice_ring_windowing!(SliceRingImpl::<i32>::new())
     });
 }

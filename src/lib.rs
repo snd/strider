@@ -50,7 +50,7 @@ const MAXIMUM_ZST_CAPACITY: usize = usize::MAX;
 //
 //  R             W
 // [o o o o o o o . . . .]
-pub struct OptimizedSliceRing<T> {
+pub struct SliceRingImpl<T> {
     /// index into `buf` of the first element that could be read.
     /// only to be incremented.
     pub first_readable: usize,
@@ -80,20 +80,20 @@ fn wrap_index(index: usize, size: usize) -> usize {
 /// appending to the back, reading from the front
 /// and dropping from the front.
 /// which is much faster.
-/// TODO call OptimizedSliceRingImpl
-impl<T> OptimizedSliceRing<T> {
-    /// Creates an empty `OptimizedSliceRing`.
-    pub fn new() -> OptimizedSliceRing<T> {
-        OptimizedSliceRing::with_capacity(INITIAL_CAPACITY)
+/// TODO call SliceRingImplImpl
+impl<T> SliceRingImpl<T> {
+    /// Creates an empty `SliceRingImpl`.
+    pub fn new() -> SliceRingImpl<T> {
+        SliceRingImpl::with_capacity(INITIAL_CAPACITY)
     }
 
-    /// Creates an empty `OptimizedSliceRing` with space for at least `n` elements.
-    pub fn with_capacity(n: usize) -> OptimizedSliceRing<T> {
+    /// Creates an empty `SliceRingImpl` with space for at least `n` elements.
+    pub fn with_capacity(n: usize) -> SliceRingImpl<T> {
         // +1 since the ringbuffer always leaves one space empty
         let cap = cmp::max(n + 1, MINIMUM_CAPACITY + 1).next_power_of_two();
         assert!(cap > n, "capacity overflow");
 
-        OptimizedSliceRing {
+        SliceRingImpl {
             first_readable: 0,
             next_writable: 0,
             buf: Vec::with_capacity(cap),
@@ -226,7 +226,7 @@ impl<T> OptimizedSliceRing<T> {
 
 // TODO test with zero sized types and max length
 
-impl<T: Clone> SliceRing<T> for OptimizedSliceRing<T> {
+impl<T: Clone> SliceRing<T> for SliceRingImpl<T> {
     /// increases `self.len()` by `count`.
     fn push_many_back(&mut self, input: &[T]) {
         // make enough space

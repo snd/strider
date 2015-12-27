@@ -3,7 +3,7 @@ use std::collections::VecDeque;
 #[macro_use]
 extern crate sliding_window;
 use sliding_window::SliceRing;
-use sliding_window::OptimizedSliceRing;
+use sliding_window::SliceRingImpl;
 
 #[test]
 fn test_slice_ring_unoptimized() {
@@ -11,5 +11,5 @@ fn test_slice_ring_unoptimized() {
 }
 #[test]
 fn test_slice_ring_optimized() {
-    test_slice_ring!(OptimizedSliceRing::<i32>::new());
+    test_slice_ring!(SliceRingImpl::<i32>::new());
 }
