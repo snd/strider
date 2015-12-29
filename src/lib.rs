@@ -1,3 +1,31 @@
+/*!
+reads integers from stdin and
+without any memory allocations (past the initial).
+```no_run
+extern crate strider;
+
+let window_size: usize = 4096;
+let step_size: usize = 512;
+
+let mut ring = strider::SliceRingImpl::<i32>::new();
+let mut window_buf = Vec::<i32>::new();
+
+// loop {
+//     let input_count = input.read(input_buffer).unwrap();
+//     let is_end_of_file = input_count == 0;
+//     if is_end_of_file { break; }
+//     assert!(input_count % 2 == 0);
+//     let sample_count = input_count / 2;
+//
+//     ring.push_many_back(
+//     while window_size <= ring.len() {
+//         ring.read_many_front(&mut window_buf[..]);
+//         ring.drop_many_front(step_size)
+//     }
+// }
+```
+*/
+
 use std::collections::VecDeque;
 use std::usize;
 use std::mem;
