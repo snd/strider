@@ -82,8 +82,9 @@ const MINIMUM_CAPACITY: usize = 1; // 2 - 1
 // TODO don't know if this is correct
 const MAXIMUM_ZST_CAPACITY: usize = usize::MAX;
 
-/// readable area starts at `first_readable` and goes until (not including)
-/// `next_writable` is one after the last readable.
+/// readable area starts at `first_readable` and goes until
+/// `next_writable`.
+/// `next_writable` is one after the last readable and not readable.
 ///
 /// ```
 /// R = first_readable
@@ -129,12 +130,12 @@ fn wrap_index(index: usize, size: usize) -> usize {
 /// which is much faster.
 /// TODO call SliceRingImplImpl
 impl<T> SliceRingImpl<T> {
-    /// Creates an empty `SliceRingImpl`.
+    /// creates an empty `SliceRingImpl`.
     pub fn new() -> SliceRingImpl<T> {
         SliceRingImpl::with_capacity(INITIAL_CAPACITY)
     }
 
-    /// Creates an empty `SliceRingImpl` with space for at least `n` elements.
+    /// creates an empty `SliceRingImpl` with space for at least `n` elements.
     pub fn with_capacity(n: usize) -> SliceRingImpl<T> {
         // +1 since the ringbuffer always leaves one space empty
         let cap = cmp::max(n + 1, MINIMUM_CAPACITY + 1).next_power_of_two();
@@ -167,12 +168,15 @@ impl<T> SliceRingImpl<T> {
         self.first_readable <= self.next_writable
     }
 
+    /// returns the number of elements in the `SliceRingImpl`
     #[inline]
     pub fn len(&self) -> usize {
         count(self.first_readable, self.next_writable, self.cap())
     }
 
-    /// - 1 because ...
+    /// returns the index into the underlying buffer
+    /// for a given logical element
+    /// index + addend
     #[inline]
     pub fn wrap_add(&self, index: usize, addend: usize) -> usize {
         // wrapping_add is a method of std::usize
