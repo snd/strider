@@ -1,15 +1,37 @@
-# sliding-window
+# strider
+
+> strider: one who walks rapidly with long steps
+
+**useful for stepping through a streaming, possibly infinite
+series (sequence) of data (values) while fast and [while avoiding
+unnecessary memory allocations](#memory).**
+
+### [generated documentation](https://snd.github.io/strider/strider/index.html)
+
+### motivation
+
+the [short-time fourier transform](https://en.wikipedia.org/wiki/Short-time_Fourier_transform),
+and other data processing methods, require stepping through a
+series of values
+
+useful for stepping
+through a streaming, possible infinite series of data
+while avoiding unnecessary memory allocations.
+
+### example
+
+
+two backing buffer types:
+one simple for illustration
+one optimized for performance
+benchmarked against each other
 
 often you want to do deque operations on multiple values at
 once. operations implemented on std::collections::VecDeque
 as well as an optimized implementation.
 
-step through a (possibly infinite, streaming) series of data
-while avoiding unnecessary memory allocations.
 
 
-
-for stepping through a possibly infinite streaming series of data
 
 
 
