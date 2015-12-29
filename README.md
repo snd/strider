@@ -4,7 +4,7 @@
 works well.
 has a large test and benchmark suite.
 documentation is unfinished and in rough shape.
-lacks polish. will probably change a lot.
+lacks polish. will probably change a lot.*
 
 [![Build Status](https://travis-ci.org/snd/strider.svg?branch=master)](https://travis-ci.org/snd/strider/branches)
 [![](https://meritbadge.herokuapp.com/strider)](https://crates.io/crates/strider)
