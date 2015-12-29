@@ -4,9 +4,9 @@ extern crate test;
 use std::collections::VecDeque;
 
 #[macro_use]
-extern crate sliding_window;
-use sliding_window::SliceRing;
-use sliding_window::SliceRingImpl;
+extern crate strider;
+use strider::SliceRing;
+use strider::SliceRingImpl;
 
 #[bench]
 fn bench_empty_to_probe_for_release_mode(b: &mut test::Bencher) {
