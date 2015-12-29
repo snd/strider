@@ -1,6 +1,7 @@
 /*!
 reads integers from stdin and
 without any memory allocations (past the initial).
+
 ```no_run
 extern crate strider;
 
@@ -81,8 +82,9 @@ const MINIMUM_CAPACITY: usize = 1; // 2 - 1
 // TODO don't know if this is correct
 const MAXIMUM_ZST_CAPACITY: usize = usize::MAX;
 
-/// readable area starts at first_readable and goes until (not including)
-/// next_writable is one after the last readable
+/// readable area starts at `first_readable` and goes until (not including)
+/// `next_writable` is one after the last readable.
+///
 /// ```
 /// R = first_readable
 /// W = next_writable
