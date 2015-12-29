@@ -1,8 +1,22 @@
 /*!
-reads integers from stdin and
-without any memory allocations (past the initial).
 
-```no_run
+**useful for stepping (variable step) a window (variable size)
+through a streaming (possibly infinite)
+series of values [while avoiding
+unnecessary memory allocations](https://snd.github.io/strider/strider/index.html#memory)**
+
+this is needed for the [short-time fourier transform](https://en.wikipedia.org/wiki/Short-time_Fourier_transform)
+and other data/signal processing methods.
+
+to use add `strider = "0.1.0"`
+to the `[dependencies]` section of your `Cargo.toml` and `extern crate strider;` in your code.
+
+a little example program that reads from stdin while never using
+without any heap allocations after the initial ones
+
+```ignore
+use std::io;
+
 extern crate strider;
 
 let window_size: usize = 4096;
@@ -11,20 +25,78 @@ let step_size: usize = 512;
 let mut ring = strider::SliceRingImpl::<i32>::new();
 let mut window_buf = Vec::<i32>::new();
 
-// loop {
-//     let input_count = input.read(input_buffer).unwrap();
-//     let is_end_of_file = input_count == 0;
-//     if is_end_of_file { break; }
-//     assert!(input_count % 2 == 0);
-//     let sample_count = input_count / 2;
-//
-//     ring.push_many_back(
-//     while window_size <= ring.len() {
-//         ring.read_many_front(&mut window_buf[..]);
-//         ring.drop_many_front(step_size)
-//     }
-// }
+fn main() {
+    loop {
+        let input_count = input.read(input_buffer).unwrap();
+        let is_end_of_file = input_count == 0;
+        if is_end_of_file { break; }
+        assert!(input_count % 2 == 0);
+        let sample_count = input_count / 2;
+
+        ring.push_many_back(
+        // whenever enough samples have accumulated you can read from it
+        while window_size <= ring.len() {
+            ring.read_many_front(&mut window_buf[..]);
+            ring.drop_many_front(step_size)
+        }
+    }
+}
 ```
+
+### memory
+
+these operations read from and writes to buffers that you control.
+
+
+### performance
+
+`strider::SliceRing` is implemented by `std::collections::VecDeque`
+and `strider::SliceRingImpl`.
+`strider::SliceRingImpl` is an optimized implementation
+of `strider::SliceRing` that is 2 to 6 times faster than
+the implementation using `std::collections::VecDeque`.
+see the benchmarks.
+
+two backing buffer types:
+one simple for illustration
+one optimized for performance
+benchmarked against each other
+
+often you want to do deque operations on multiple values at
+once. operations implemented on std::collections::VecDeque
+as well as an optimized implementation.
+
+
+
+windowing the equivalent of 1 minute of 44100 hz audio samples
+with a window_size of 1024 and step_size of 512
+only takes a few (6) milliseconds and constant memory of about
+
+
+
+
+this is probably what you want
+
+
+sliding-window uses a `std::collections::VecDeque` under the hood.
+
+will double in size only when full.
+
+for the common case this allocates memory once, maybe twice and is done with it.
+
+fast
+
+### performance
+
+optimized for and restricted to working on multiple things at once.
+which it can do faster.
+
+performance is relative. so instead of claiming that this is fast, we'll instead prove
+that it is much faster than a naive implementation building on `std::collections::VecDeque`.
+
+reads integers from stdin and
+without any memory allocations (past the initial).
+
 */
 
 use std::collections::VecDeque;
@@ -86,7 +158,7 @@ const MAXIMUM_ZST_CAPACITY: usize = usize::MAX;
 /// `next_writable`.
 /// `next_writable` is one after the last readable and not readable.
 ///
-/// ```
+/// ```ignore
 /// R = first_readable
 /// W = next_writable
 /// o = occupied (len)

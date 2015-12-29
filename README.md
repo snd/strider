@@ -1,61 +1,28 @@
-# strider
+# strider (WIP)
+
+*this is a work in progress:
+works well.
+has a large test and benchmark suite.
+documentation is unfinished and in rough shape.
+lacks polish. will probably change a lot.
+
+[![Build Status](https://travis-ci.org/snd/strider.svg?branch=master)](https://travis-ci.org/snd/strider/branches)
+[![](https://meritbadge.herokuapp.com/strider)](https://crates.io/crates/strider)
 
 > strider: one who walks rapidly with long steps
 
-**useful for stepping through a streaming, possibly infinite
-series (sequence) of data (values) while fast and [while avoiding
-unnecessary memory allocations](#memory).**
+**useful for stepping (variable step) a window (variable size)
+through a streaming (possibly infinite)
+series of values [while avoiding
+unnecessary memory allocations](https://snd.github.io/strider/strider/index.html#memory)**
 
-### [generated documentation](https://snd.github.io/strider/strider/index.html)
+this is needed for the [short-time fourier transform](https://en.wikipedia.org/wiki/Short-time_Fourier_transform)
+and other data/signal processing methods.
 
-### motivation
+to use add `strider = "0.1.0"`
+to the `[dependencies]` section of your `Cargo.toml` and `extern crate strider;` in your code.
 
-the [short-time fourier transform](https://en.wikipedia.org/wiki/Short-time_Fourier_transform),
-and other data processing methods, require stepping through a
-series of values
-
-useful for stepping
-through a streaming, possible infinite series of data
-while avoiding unnecessary memory allocations.
-
-### example
-
-
-two backing buffer types:
-one simple for illustration
-one optimized for performance
-benchmarked against each other
-
-often you want to do deque operations on multiple values at
-once. operations implemented on std::collections::VecDeque
-as well as an optimized implementation.
-
-
-
-
-
-
-
-
-this is probably what you want
-
-### memory
-
-sliding-window uses a `std::collections::VecDeque` under the hood.
-
-will double in size only when full.
-
-for the common case this allocates memory once, maybe twice and is done with it.
-
-fast
-
-### performance
-
-optimized for and restricted to working on multiple things at once.
-which it can do faster.
-
-performance is relative. so instead of claiming that this is fast, we'll instead prove
-that it is much faster than a naive implementation building on `std::collections::VecDeque`.
+## [read on in the documentation](https://snd.github.io/strider/strider/index.html)
 
 ### [contributing](contributing.md)
 
