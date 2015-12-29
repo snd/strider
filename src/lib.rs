@@ -34,10 +34,12 @@ use std::cmp;
 
 /// ringbuffer operations on slices
 pub trait SliceRing<T> {
-    /// appends `values` to the back.
+    /// appends `values` to the back of this ring.
     fn push_many_back(&mut self, values: &[T]);
     /// removes `count` elements from the front of this ring.
     /// returns how many elements were removed.
+    /// returns less than `count` if less elements are present
+    /// in this ring.
     fn drop_many_front(&mut self, count: usize) -> usize;
     /// copies the first `output.len()` elements present in this ring
     /// into `output`.
@@ -76,24 +78,28 @@ impl<T: Clone> SliceRing<T> for VecDeque<T> {
 
 const INITIAL_CAPACITY: usize = 7; // 2^3 - 1
 const MINIMUM_CAPACITY: usize = 1; // 2 - 1
+// TODO don't know if this is correct
 const MAXIMUM_ZST_CAPACITY: usize = usize::MAX;
 
-// readable area starts at first_readable and goes until (not including)
-// next_writable is one after the last readable
-
-// TODO move this into its own file
-// R = first_readable
-// W = next_writable
-// o = occupied (len)
-// . = free
-//
-//  R             W
-// [o o o o o o o . . . .]
+/// readable area starts at first_readable and goes until (not including)
+/// next_writable is one after the last readable
+/// ```
+/// R = first_readable
+/// W = next_writable
+/// o = occupied (len)
+/// . = free
+///
+///  R             W
+/// [o o o o o o o . . . .]
+/// ```
 pub struct SliceRingImpl<T> {
     /// index into `buf` of the first element that could be read.
-    /// only to be incremented.
+    /// only gets incremented, never decremented.
+    /// wraps around.
     pub first_readable: usize,
-    /// index into `buf` where the next element could we written
+    /// index into `buf` where the next element could we written.
+    /// only gets incremented, never decremented.
+    /// wraps around at `buf.cap()`.
     pub next_writable: usize,
     pub buf: Vec<T>,
 }
