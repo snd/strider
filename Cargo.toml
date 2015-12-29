@@ -1,0 +1,11 @@
+[package]
+authors = ["Maximilian Krüger <kruemaxi@gmail.com>"]
+name = "strider"
+version = "0.1.0"
+description = ""
+documentation = "https://snd.github.io/strider/strider/index.html"
+homepage = "https://github.com/snd/strider"
+repository = "https://github.com/snd/strider.git"
+readme = "README.md"
+keywords = ["sliding", "window", "deque"]
+license = "MIT"
