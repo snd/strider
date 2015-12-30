@@ -14,7 +14,7 @@ to the `[dependencies]` section of your `Cargo.toml` and `extern crate strider;`
 a little example program that reads from stdin while never using
 without any heap allocations after the initial ones
 
-```ignore
+```no_run
 use std::io;
 use std::io::{Write, Read};
 
