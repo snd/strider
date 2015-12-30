@@ -196,6 +196,11 @@ fn wrap_index(index: usize, size: usize) -> usize {
     index & max_index
 }
 
+#[inline]
+fn next_power_of_two(x: usize) -> usize {
+    (if x.is_power_of_two() { x + 1 } else { x }).next_power_of_two()
+}
+
 /// ringbuffer focused on and optimized for operating on slices of values:
 /// appending to the back, reading from the front
 /// and dropping from the front.
@@ -355,9 +360,9 @@ impl<T: Clone> SliceRing<T> for SliceRingImpl<T> {
         // make enough space
         let additional = input.len();
         let required = self.len() + additional;
-        let old_cap = self.cap();
-        if old_cap < required {
-            self.buf.reserve(required.next_power_of_two());
+        if self.capacity() < required {
+            let old_cap = self.cap();
+            self.buf.reserve(next_power_of_two(required));
             unsafe {
                 self.handle_cap_increase(old_cap);
             }
