@@ -16,28 +16,30 @@ without any heap allocations after the initial ones
 
 ```ignore
 use std::io;
+use std::io::{Write, Read};
 
 extern crate strider;
-
-let window_size: usize = 4096;
-let step_size: usize = 512;
-
-let mut ring = strider::SliceRingImpl::<i32>::new();
-let mut window_buf = Vec::<i32>::new();
+use strider::{SliceRing, SliceRingImpl};
 
 fn main() {
-    loop {
-        let input_count = input.read(input_buffer).unwrap();
-        let is_end_of_file = input_count == 0;
-        if is_end_of_file { break; }
-        assert!(input_count % 2 == 0);
-        let sample_count = input_count / 2;
+    const WINDOW_SIZE: usize = 8;
+    const STEP_SIZE: usize = 2;
 
-        ring.push_many_back(
-        // whenever enough samples have accumulated you can read from it
-        while window_size <= ring.len() {
-            ring.read_many_front(&mut window_buf[..]);
-            ring.drop_many_front(step_size)
+    let mut ring = SliceRingImpl::<u8>::new();
+    let mut input_buffer: &mut [u8] = &mut [0; 4];
+    let mut window_buffer: &mut [u8] = &mut [0; WINDOW_SIZE];
+
+    loop {
+        let input_count = io::stdin().read(input_buffer).unwrap();
+        if input_count == 0 { break; }
+
+        ring.push_many_back(&input_buffer[..input_count]);
+        // read as long as enough samples are present (remain) in ring
+        while WINDOW_SIZE <= ring.len() {
+            ring.read_many_front(window_buffer);
+            io::stdout().write(window_buffer).unwrap();
+            // step
+            ring.drop_many_front(STEP_SIZE);
         }
     }
 }
