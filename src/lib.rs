@@ -5,14 +5,20 @@ through a streaming (possibly infinite)
 series of values [while avoiding
 unnecessary memory allocations](https://snd.github.io/strider/strider/index.html#memory)**
 
-this is needed for the [short-time fourier transform](https://en.wikipedia.org/wiki/Short-time_Fourier_transform)
+essential in computing [the short-time fourier transform](https://en.wikipedia.org/wiki/Short-time_Fourier_transform)
 and other data/signal processing methods.
 
 to use add `strider = "0.1.0"`
-to the `[dependencies]` section of your `Cargo.toml` and `extern crate strider;` in your code.
+to the `[dependencies]` section of your `Cargo.toml` and call `extern crate strider;` in your code.
 
-a little example program that reads from stdin while never using
-without any heap allocations after the initial ones
+### example
+
+following is a program that reads a stream of chars from stdin.
+it writes every consecutive sequence of `WINDOW_SIZE` chars that
+is `STEP_SIZE` apart to stdout.
+for the input of `ABCDEFGHIJK` it produces the output `ABCDCDEFEFGHGHIJ`.
+it uses constant memory and does **no** allocations after the initial ones.
+you should be able to grasp the idea and adapt it to your needs.
 
 ```no_run
 use std::io;
@@ -22,23 +28,25 @@ extern crate strider;
 use strider::{SliceRing, SliceRingImpl};
 
 fn main() {
-    const WINDOW_SIZE: usize = 8;
+    const WINDOW_SIZE: usize = 4;
     const STEP_SIZE: usize = 2;
 
     let mut ring = SliceRingImpl::<u8>::new();
-    let mut input_buffer: &mut [u8] = &mut [0; 4];
+    let mut input_buffer: &mut [u8] = &mut [0; 20];
     let mut window_buffer: &mut [u8] = &mut [0; WINDOW_SIZE];
 
     loop {
         let input_count = io::stdin().read(input_buffer).unwrap();
+        // leave the loop when we reach end of file
         if input_count == 0 { break; }
 
+        // add elements to the back of the ring
         ring.push_many_back(&input_buffer[..input_count]);
-        // read as long as enough samples are present (remain) in ring
+        // read as long as we can read windows of length `WINDOW_SIZE`
         while WINDOW_SIZE <= ring.len() {
             ring.read_many_front(window_buffer);
             io::stdout().write(window_buffer).unwrap();
-            // step
+            // do a step by dropping the first `STEP_SIZE` elements in ring
             ring.drop_many_front(STEP_SIZE);
         }
     }
