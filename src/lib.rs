@@ -8,7 +8,7 @@ unnecessary memory allocations](https://snd.github.io/strider/strider/index.html
 essential in computing [the short-time fourier transform](https://en.wikipedia.org/wiki/Short-time_Fourier_transform)
 and other data/signal processing methods.
 
-to use add `strider = "0.1.0"`
+to use add `strider = "0.1.1"`
 to the `[dependencies]` section of your `Cargo.toml` and call `extern crate strider;` in your code.
 
 ### example
