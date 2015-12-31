@@ -4,7 +4,7 @@
 (trait.SliceRing.html)
 with an
 [efficient implementation]
-(struct.SliceRingImpl.html).**
+(struct.SliceRingImpl.html)**
 
 useful for moving a window with variable step
 through a possibly infinite
@@ -87,7 +87,7 @@ with a window_size of 1024 and step_size of 512
 the following holds true for both implementations:
 
 [strider::SliceRing::read_many_front](trait.SliceRing.html#tymethod.read_many_front)
-never does allocate memory. it reads into a buffer that you
+never does allocate memory. it writes into a buffer that you
 allocate and control.
 
 [strider::SliceRing::drop_many_front](trait.SliceRing.html#tymethod.read_many_drop)

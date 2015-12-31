@@ -7,7 +7,7 @@
 (https://snd.github.io/strider/strider/trait.SliceRing.html)
 with an
 [efficient implementation]
-(https://snd.github.io/strider/strider/struct.SliceRingImpl.html).**
+(https://snd.github.io/strider/strider/struct.SliceRingImpl.html)**
 
 useful for moving a window with variable step
 through a possibly infinite
