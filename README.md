@@ -3,13 +3,11 @@
 [![Build Status](https://travis-ci.org/snd/strider.svg?branch=master)](https://travis-ci.org/snd/strider/branches)
 [![](https://meritbadge.herokuapp.com/strider)](https://crates.io/crates/strider)
 
-**
-[ringbuffer operations on multiple values at once]
+**[ringbuffer operations on multiple values at once]
 (https://snd.github.io/strider/strider/trait.SliceRing.html)
 with an
 [efficient implementation]
-(https://snd.github.io/strider/strider/struct.SliceRingImpl.html).
-**
+(https://snd.github.io/strider/strider/struct.SliceRingImpl.html).**
 
 useful for moving a window with variable step
 through a possibly infinite

@@ -1,12 +1,10 @@
 /*!
 
-**
-[ringbuffer operations on multiple values at once]
+**[ringbuffer operations on multiple values at once]
 (trait.SliceRing.html)
 with an
 [efficient implementation]
-(struct.SliceRingImpl.html).
- **
+(struct.SliceRingImpl.html).**
 
 useful for moving a window with variable step
 through a possibly infinite
