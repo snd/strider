@@ -12,7 +12,8 @@ useful for moving a window with variable step
 through a possibly infinite
 stream of values
 [while avoiding
-unnecessary memory allocations](#memory)**
+unnecessary memory allocations]
+(#memory)
 
 handy when computing the [short-time fourier transform](https://en.wikipedia.org/wiki/Short-time_Fourier_transform).
 
