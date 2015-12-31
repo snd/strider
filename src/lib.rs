@@ -4,7 +4,7 @@
 (trait.SliceRing.html)
 with an
 [efficient implementation]
-(struct.SliceRingImpl.html)**
+(#performance)**
 
 useful for moving a window with variable step
 through a possibly infinite
@@ -61,7 +61,7 @@ fn main() {
 }
 ```
 
-### performance
+## performance
 
 the trait [strider::SliceRing](trait.SliceRing.html) is implemented for
 [std::collections::VecDeque]
@@ -82,7 +82,7 @@ windowing the equivalent of 1 minute of 44100 hz audio samples
 with a window_size of 1024 and step_size of 512
 [only takes around 5 milliseconds](https://travis-ci.org/snd/strider/jobs/99508425#L207).
 
-### memory
+## memory
 
 the following holds true for both implementations:
 
@@ -98,7 +98,7 @@ reads from a buffer that you
 allocate and control.
 it might allocate more capacity
 when you push values and as a result there are more values in the ring than ever before.
-if you repeatedly read and drop after each push, as in the example above,
+if you repeatedly read and drop after each push, as in the [example](#example) above,
 the number of values will stay below a certain value and it will never
 allocate memory after an initial 1 or 2 allocations.
 */
