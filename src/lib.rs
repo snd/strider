@@ -1,24 +1,33 @@
 /*!
 
-**useful for stepping (variable step) a window (variable size)
-through a streaming (possibly infinite)
-series of values [while avoiding
-unnecessary memory allocations](https://snd.github.io/strider/strider/index.html#memory)**
+**
+[ringbuffer operations on multiple values at once]
+(trait.SliceRing.html)
+with an
+[efficient implementation]
+(struct.SliceRingImpl.html).
+ **
 
-essential in computing [the short-time fourier transform](https://en.wikipedia.org/wiki/Short-time_Fourier_transform)
-and other data/signal processing methods.
+useful for moving a window with variable step
+through a possibly infinite
+stream of values
+[while avoiding
+unnecessary memory allocations](#memory)**
+
+handy when computing the [short-time fourier transform](https://en.wikipedia.org/wiki/Short-time_Fourier_transform).
 
 to use add `strider = "0.1.1"`
 to the `[dependencies]` section of your `Cargo.toml` and call `extern crate strider;` in your code.
 
-### example
+## example
 
-following is a program that reads a stream of chars from stdin.
-it writes every consecutive sequence of `WINDOW_SIZE` chars that
-is `STEP_SIZE` apart to stdout.
+the following program reads a stream of chars from stdin.
+it moves a window of size 4 (`WINDOW_SIZE`)
+through that stream in steps of 2 (`STEP_SIZE`).
+it writes the contents of every window to stdout.
 for the input of `ABCDEFGHIJK` it produces the output `ABCDCDEFEFGHGHIJ`.
 it uses constant memory and does **no** allocations after the initial ones.
-you should be able to grasp the idea and adapt it to your needs.
+you should be able to adapt it to your needs.
 
 ```no_run
 use std::io;
@@ -53,60 +62,46 @@ fn main() {
 }
 ```
 
-### memory
-
-these operations read from and writes to buffers that you control.
-
-
 ### performance
 
-`strider::SliceRing` is implemented by `std::collections::VecDeque`
-and `strider::SliceRingImpl`.
-`strider::SliceRingImpl` is an optimized implementation
-of `strider::SliceRing` that is 2 to 6 times faster than
-the implementation using `std::collections::VecDeque`.
-see the benchmarks.
+the trait [strider::SliceRing](trait.SliceRing.html) is implemented for
+[std::collections::VecDeque]
+(https://doc.rust-lang.org/stable/std/collections/struct.VecDeque.html)
+and [strider::SliceRingImpl](struct.SliceRingImpl.html).
 
-two backing buffer types:
-one simple for illustration
-one optimized for performance
-benchmarked against each other
+[strider::SliceRingImpl](struct.SliceRingImpl.html) is
+limited to the functionality in
+[strider::SliceRing](trait.SliceRing.html)
+but optimized for it and [**2 to 6 times faster**](https://travis-ci.org/snd/strider/jobs/99508425#L192)
+than the implementation
+for [std::collections::VecDeque](https://doc.rust-lang.org/stable/std/collections/struct.VecDeque.html).
 
-often you want to do deque operations on multiple values at
-once. operations implemented on std::collections::VecDeque
-as well as an optimized implementation.
-
-
+see the benchmark [results](https://travis-ci.org/snd/strider/jobs/99508425#L192)
+and [implementation](https://github.com/snd/strider/blob/master/benches/lib.rs).
 
 windowing the equivalent of 1 minute of 44100 hz audio samples
 with a window_size of 1024 and step_size of 512
-only takes a few (6) milliseconds and constant memory of about
+[only takes around 5 milliseconds](https://travis-ci.org/snd/strider/jobs/99508425#L207).
 
+### memory
 
+the following holds true for both implementations:
 
+[strider::SliceRing::read_many_front](trait.SliceRing.html#tymethod.read_many_front)
+never does allocate memory. it reads into a buffer that you
+allocate and control.
 
-this is probably what you want
+[strider::SliceRing::drop_many_front](trait.SliceRing.html#tymethod.read_many_drop)
+never does allocate memory.
 
-
-sliding-window uses a `std::collections::VecDeque` under the hood.
-
-will double in size only when full.
-
-for the common case this allocates memory once, maybe twice and is done with it.
-
-fast
-
-### performance
-
-optimized for and restricted to working on multiple things at once.
-which it can do faster.
-
-performance is relative. so instead of claiming that this is fast, we'll instead prove
-that it is much faster than a naive implementation building on `std::collections::VecDeque`.
-
-reads integers from stdin and
-without any memory allocations (past the initial).
-
+[strider::SliceRing::push_many_back](trait.SliceRing.html#tymethod.push_many_back)
+reads from a buffer that you
+allocate and control.
+it might allocate more capacity
+when you push values and as a result there are more values in the ring than ever before.
+if you repeatedly read and drop after each push, as in the example above,
+the number of values will stay below a certain value and it will never
+allocate memory after an initial 1 or 2 allocations.
 */
 
 use std::collections::VecDeque;

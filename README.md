@@ -1,28 +1,23 @@
-# strider (WIP)
-
-*this is a work in progress:
-works well.
-has a large test and benchmark suite.
-documentation is unfinished and in rough shape.
-lacks polish. will probably change a lot.*
+# strider
 
 [![Build Status](https://travis-ci.org/snd/strider.svg?branch=master)](https://travis-ci.org/snd/strider/branches)
 [![](https://meritbadge.herokuapp.com/strider)](https://crates.io/crates/strider)
 
-> strider: one who walks rapidly with long steps
+**[ringbuffer operations on multiple values at once](https://snd.github.io/strider/strider/trait.SliceRing.html) with an
+[efficient implementation](https://snd.github.io/strider/strider/struct.SliceRingImpl.html).**
 
-**useful for stepping (variable step) a window (variable size)
-through a streaming (possibly infinite)
-series of values [while avoiding
-unnecessary memory allocations](https://snd.github.io/strider/strider/index.html#memory)**
+useful for moving a window with variable step
+through a possibly infinite
+stream of values
+[while avoiding unnecessary memory allocations]
+(https://snd.github.io/strider/strider/index.html#memory)**
 
-this is needed for the [short-time fourier transform](https://en.wikipedia.org/wiki/Short-time_Fourier_transform)
-and other data/signal processing methods.
+handy when computing the [short-time fourier transform](https://en.wikipedia.org/wiki/Short-time_Fourier_transform).
 
 to use add `strider = "0.1.1"`
 to the `[dependencies]` section of your `Cargo.toml` and call `extern crate strider;` in your code.
 
-## [read on in the documentation](https://snd.github.io/strider/strider/index.html)
+## [read the documentation for an example and more !](https://snd.github.io/strider/strider/index.html)
 
 ### [contributing](contributing.md)
 
