@@ -7,5 +7,5 @@ documentation = "https://snd.github.io/strider/strider/index.html"
 homepage = "https://github.com/snd/strider"
 repository = "https://github.com/snd/strider.git"
 readme = "README.md"
-keywords = ["sliding", "window", "ringbuffer", "stepping", "data]
+keywords = ["sliding", "window", "ringbuffer", "stepping", "data"]
 license = "MIT"
