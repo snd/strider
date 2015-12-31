@@ -17,7 +17,7 @@ stream of values
 
 handy when computing the [short-time fourier transform](https://en.wikipedia.org/wiki/Short-time_Fourier_transform).
 
-to use add `strider = "0.1.1"`
+to use add `strider = "0.1.2"`
 to the `[dependencies]` section of your `Cargo.toml` and call `extern crate strider;` in your code.
 
 ## [read the documentation for an example and more !](https://snd.github.io/strider/strider/index.html)
