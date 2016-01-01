@@ -87,11 +87,11 @@ with a window_size of 1024 and step_size of 512
 the following holds true for both implementations:
 
 [strider::SliceRing::read_many_front](trait.SliceRing.html#tymethod.read_many_front)
-never does allocate memory. it writes into a buffer that you
+never allocates memory. it writes into a buffer that you
 allocate and control.
 
 [strider::SliceRing::drop_many_front](trait.SliceRing.html#tymethod.read_many_drop)
-never does allocate memory.
+never allocates memory.
 
 [strider::SliceRing::push_many_back](trait.SliceRing.html#tymethod.push_many_back)
 reads from a buffer that you
