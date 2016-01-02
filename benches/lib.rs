@@ -9,8 +9,8 @@ use strider::SliceRing;
 use strider::SliceRingImpl;
 
 #[bench]
-fn bench_empty_to_probe_for_release_mode(b: &mut test::Bencher) {
-    b.iter(|| 1)
+fn bench_empty_to_probe_for_release_mode(bencher: &mut test::Bencher) {
+    bencher.iter(|| 1)
 }
 
 macro_rules! bench_push_many_back {
@@ -24,20 +24,20 @@ macro_rules! bench_push_many_back {
     }}
 }
 #[bench]
-fn bench_push_many_back_deque(b: &mut test::Bencher) {
-    bench_push_many_back!(b, VecDeque::new());
+fn bench_push_many_back_deque(bencher: &mut test::Bencher) {
+    bench_push_many_back!(bencher, VecDeque::new());
 }
 #[bench]
-fn bench_push_many_back_deque_with_capacity(b: &mut test::Bencher) {
-    bench_push_many_back!(b, VecDeque::with_capacity(1000));
+fn bench_push_many_back_deque_with_capacity(bencher: &mut test::Bencher) {
+    bench_push_many_back!(bencher, VecDeque::with_capacity(1000));
 }
 #[bench]
-fn bench_push_many_back_optimized(b: &mut test::Bencher) {
-    bench_push_many_back!(b, SliceRingImpl::new());
+fn bench_push_many_back_optimized(bencher: &mut test::Bencher) {
+    bench_push_many_back!(bencher, SliceRingImpl::new());
 }
 #[bench]
-fn bench_push_many_back_optimized_with_capacity(b: &mut test::Bencher) {
-    bench_push_many_back!(b, SliceRingImpl::with_capacity(1000));
+fn bench_push_many_back_optimized_with_capacity(bencher: &mut test::Bencher) {
+    bench_push_many_back!(bencher, SliceRingImpl::with_capacity(1000));
 }
 
 macro_rules! bench_drop_many_front {
@@ -52,20 +52,20 @@ macro_rules! bench_drop_many_front {
 }
 
 #[bench]
-fn bench_drop_many_front_deque(b: &mut test::Bencher) {
-    bench_drop_many_front!(b, VecDeque::new());
+fn bench_drop_many_front_deque(bencher: &mut test::Bencher) {
+    bench_drop_many_front!(bencher, VecDeque::new());
 }
 #[bench]
-fn bench_drop_many_front_deque_with_capacity(b: &mut test::Bencher) {
-    bench_drop_many_front!(b, VecDeque::with_capacity(1000));
+fn bench_drop_many_front_deque_with_capacity(bencher: &mut test::Bencher) {
+    bench_drop_many_front!(bencher, VecDeque::with_capacity(1000));
 }
 #[bench]
-fn bench_drop_many_front_optimized(b: &mut test::Bencher) {
-    bench_drop_many_front!(b, SliceRingImpl::new());
+fn bench_drop_many_front_optimized(bencher: &mut test::Bencher) {
+    bench_drop_many_front!(bencher, SliceRingImpl::new());
 }
 #[bench]
-fn bench_drop_many_front_optimized_with_capacity(b: &mut test::Bencher) {
-    bench_drop_many_front!(b, SliceRingImpl::with_capacity(1000));
+fn bench_drop_many_front_optimized_with_capacity(bencher: &mut test::Bencher) {
+    bench_drop_many_front!(bencher, SliceRingImpl::with_capacity(1000));
 }
 
 macro_rules! bench_read_many_front {
@@ -80,31 +80,31 @@ macro_rules! bench_read_many_front {
     }}
 }
 #[bench]
-fn bench_read_many_front_deque(b: &mut test::Bencher) {
-    bench_read_many_front!(b, VecDeque::new());
+fn bench_read_many_front_deque(bencher: &mut test::Bencher) {
+    bench_read_many_front!(bencher, VecDeque::new());
 }
 #[bench]
-fn bench_read_many_front_deque_with_capacity(b: &mut test::Bencher) {
-    bench_read_many_front!(b, VecDeque::with_capacity(1000));
+fn bench_read_many_front_deque_with_capacity(bencher: &mut test::Bencher) {
+    bench_read_many_front!(bencher, VecDeque::with_capacity(1000));
 }
 #[bench]
-fn bench_read_many_front_optimized(b: &mut test::Bencher) {
-    bench_read_many_front!(b, SliceRingImpl::new());
+fn bench_read_many_front_optimized(bencher: &mut test::Bencher) {
+    bench_read_many_front!(bencher, SliceRingImpl::new());
 }
 #[bench]
-fn bench_read_many_front_optimized_with_capacity(b: &mut test::Bencher) {
-    bench_read_many_front!(b, SliceRingImpl::with_capacity(1000));
+fn bench_read_many_front_optimized_with_capacity(bencher: &mut test::Bencher) {
+    bench_read_many_front!(bencher, SliceRingImpl::with_capacity(1000));
 }
 
 #[bench]
-fn bench_test_slice_ring_deque(b: &mut test::Bencher) {
-    b.iter(|| {
+fn bench_test_slice_ring_deque(bencher: &mut test::Bencher) {
+    bencher.iter(|| {
         test_slice_ring!(VecDeque::<i32>::new());
     });
 }
 #[bench]
-fn bench_test_slice_ring_optimized(b: &mut test::Bencher) {
-    b.iter(|| {
+fn bench_test_slice_ring_optimized(bencher: &mut test::Bencher) {
+    bencher.iter(|| {
         test_slice_ring!(SliceRingImpl::<i32>::new())
     });
 }
@@ -127,14 +127,14 @@ macro_rules! bench_slice_ring_windowing {
     }};
 }
 #[bench]
-fn bench_slice_ring_windowing_deque(b: &mut test::Bencher) {
-    b.iter(|| {
+fn bench_slice_ring_windowing_deque(bencher: &mut test::Bencher) {
+    bencher.iter(|| {
         bench_slice_ring_windowing!(VecDeque::<i32>::new());
     });
 }
 #[bench]
-fn bench_slice_ring_windowing_optimized(b: &mut test::Bencher) {
-    b.iter(|| {
+fn bench_slice_ring_windowing_optimized(bencher: &mut test::Bencher) {
+    bencher.iter(|| {
         bench_slice_ring_windowing!(SliceRingImpl::<i32>::new())
     });
 }
@@ -220,10 +220,10 @@ macro_rules! bench_slice_ring_one_minute_audio {
     }};
 }
 #[bench]
-fn bench_slice_ring_one_minute_audio_deque(b: &mut test::Bencher) {
-    bench_slice_ring_one_minute_audio!(b, VecDeque::<i32>::new());
+fn bench_slice_ring_one_minute_audio_deque(bencher: &mut test::Bencher) {
+    bench_slice_ring_one_minute_audio!(bencher, VecDeque::<i32>::new());
 }
 #[bench]
-fn bench_slice_ring_one_minute_audio_optimized(b: &mut test::Bencher) {
-    bench_slice_ring_one_minute_audio!(b, SliceRingImpl::<i32>::new());
+fn bench_slice_ring_one_minute_audio_optimized(bencher: &mut test::Bencher) {
+    bench_slice_ring_one_minute_audio!(bencher, SliceRingImpl::<i32>::new());
 }
