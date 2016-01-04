@@ -7,7 +7,8 @@
 (https://snd.github.io/strider/strider/trait.SliceRing.html)
 with an
 [efficient implementation]
-(https://snd.github.io/strider/strider/index.html#performance)**
+(https://snd.github.io/strider/strider/index.html#performance).
+written in [rust](https://www.rust-lang.org/).**
 
 useful for moving a window with variable step
 through a possibly infinite
