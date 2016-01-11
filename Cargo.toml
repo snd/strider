@@ -1,7 +1,7 @@
 [package]
 authors = ["Maximilian Krüger <kruemaxi@gmail.com>"]
 name = "strider"
-version = "0.1.2"
+version = "0.1.3"
 description = "ringbuffer operations on multiple values at once with an efficient implementation. useful for moving a window with variable step through a possibly infinite stream of values while avoiding unnecessary memory allocations"
 documentation = "https://snd.github.io/strider/strider/index.html"
 homepage = "https://github.com/snd/strider"
