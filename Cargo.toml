@@ -8,4 +8,4 @@ homepage = "https://github.com/snd/strider"
 repository = "https://github.com/snd/strider.git"
 readme = "README.md"
 keywords = ["sliding", "window", "ringbuffer", "stepping", "data"]
-license = "MIT"
+license = "MIT OR Apache-2.0"
