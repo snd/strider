@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `SliceRingImpl` struct in crate `strider`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, SliceRingImpl">
+
+    <title>strider::SliceRingImpl - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../main.css">
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'><a href='index.html'>strider</a></p><script>window.sidebarCurrent = {name: 'SliceRingImpl', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content struct">
+<h1 class='fqn'><span class='in-band'>Struct <a href='index.html'>strider</a>::<wbr><a class='struct' href=''>SliceRingImpl</a></span><span class='out-of-band'><span id='render-detail'>
+            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                [<span class='inner'>&#x2212;</span>]
+            </a>
+        </span><a id='src-44' class='srclink' href='../src/strider/lib.rs.html#174-184' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct SliceRingImpl&lt;T&gt; {
+    pub first_readable: <a href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>,
+    pub next_writable: <a href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>,
+    pub buf: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;T&gt;,
+}</pre><div class='docblock'><p>readable area starts at <code>first_readable</code> and goes until
+<code>next_writable</code>.
+<code>next_writable</code> is one after the last readable and not readable.</p>
+<pre class='rust rust-example-rendered'>
+<span class='ident'>R</span> <span class='op'>=</span> <span class='ident'>first_readable</span>
+<span class='ident'>W</span> <span class='op'>=</span> <span class='ident'>next_writable</span>
+<span class='ident'>o</span> <span class='op'>=</span> <span class='ident'>occupied</span> (<span class='ident'>len</span>)
+. <span class='op'>=</span> <span class='ident'>free</span>
+
+ <span class='ident'>R</span>             <span class='ident'>W</span>
+[<span class='ident'>o</span> <span class='ident'>o</span> <span class='ident'>o</span> <span class='ident'>o</span> <span class='ident'>o</span> <span class='ident'>o</span> <span class='ident'>o</span> . . . .]</pre>
+</div><h2 class='fields'>Fields</h2>
+<table><tr class='stab '>
+                                  <td id='structfield.first_readable'><code>first_readable</code></td><td><div class='docblock'><p>index into <code>buf</code> of the first element that could be read.
+only gets incremented, never decremented.
+wraps around.</p>
+</div></td></tr><tr class='stab '>
+                                  <td id='structfield.next_writable'><code>next_writable</code></td><td><div class='docblock'><p>index into <code>buf</code> where the next element could we written.
+only gets incremented, never decremented.
+wraps around at <code>buf.cap()</code>.</p>
+</div></td></tr><tr class='stab '>
+                                  <td id='structfield.buf'><code>buf</code></td><td></td></tr></table><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl&lt;T&gt; <a class='struct' href='../strider/struct.SliceRingImpl.html' title='strider::SliceRingImpl'>SliceRingImpl</a>&lt;T&gt;</code></h3><div class='docblock'><p>ringbuffer focused on and optimized for operating on slices of values:
+appending to the back, reading from the front
+and dropping from the front.
+which is much faster.
+TODO call SliceRingImplImpl</p>
+</div><div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>() -&gt; <a class='struct' href='../strider/struct.SliceRingImpl.html' title='strider::SliceRingImpl'>SliceRingImpl</a>&lt;T&gt;</code></h4>
+<div class='docblock'><p>creates an empty <code>SliceRingImpl</code>.</p>
+</div><h4 id='method.with_capacity' class='method'><code>fn <a href='#method.with_capacity' class='fnname'>with_capacity</a>(n: <a href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>) -&gt; <a class='struct' href='../strider/struct.SliceRingImpl.html' title='strider::SliceRingImpl'>SliceRingImpl</a>&lt;T&gt;</code></h4>
+<div class='docblock'><p>creates an empty <code>SliceRingImpl</code> with space for at least <code>n</code> elements.</p>
+</div><h4 id='method.cap' class='method'><code>fn <a href='#method.cap' class='fnname'>cap</a>(&amp;self) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code></h4>
+<h4 id='method.capacity' class='method'><code>fn <a href='#method.capacity' class='fnname'>capacity</a>(&amp;self) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code></h4>
+<h4 id='method.is_continuous' class='method'><code>fn <a href='#method.is_continuous' class='fnname'>is_continuous</a>(&amp;self) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
+<h4 id='method.len' class='method'><code>fn <a href='#method.len' class='fnname'>len</a>(&amp;self) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code></h4>
+<div class='docblock'><p>returns the number of elements in the <code>SliceRingImpl</code></p>
+</div><h4 id='method.wrap_add' class='method'><code>fn <a href='#method.wrap_add' class='fnname'>wrap_add</a>(&amp;self, index: <a href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>, addend: <a href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code></h4>
+<div class='docblock'><p>returns the index into the underlying buffer
+for a given logical element
+index + addend</p>
+</div><h4 id='method.handle_cap_increase' class='method'><code>unsafe fn <a href='#method.handle_cap_increase' class='fnname'>handle_cap_increase</a>(&amp;mut self, old_cap: <a href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>)</code></h4>
+<div class='docblock'><p>this is the most complex part
+Frobs the head and tail sections around to handle the fact that we
+just reallocated. Unsafe because it trusts old_cap.</p>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl&lt;T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a>&gt; <a class='trait' href='../strider/trait.SliceRing.html' title='strider::SliceRing'>SliceRing</a>&lt;T&gt; for <a class='struct' href='../strider/struct.SliceRingImpl.html' title='strider::SliceRingImpl'>SliceRingImpl</a>&lt;T&gt;</code></h3><div class='impl-items'><h4 id='method.push_many_back' class='method'><code>fn <a href='../strider/trait.SliceRing.html#method.push_many_back' class='fnname'>push_many_back</a>(&amp;mut self, input: <a href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[</a>T<a href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>)</code></h4>
+<h4 id='method.drop_many_front' class='method'><code>fn <a href='../strider/trait.SliceRing.html#method.drop_many_front' class='fnname'>drop_many_front</a>(&amp;mut self, count: <a href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code></h4>
+<h4 id='method.read_many_front' class='method'><code>fn <a href='../strider/trait.SliceRing.html#method.read_many_front' class='fnname'>read_many_front</a>(&amp;self, output: <a href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;mut [</a>T<a href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code></h4>
+</div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../";
+        window.currentCrate = "strider";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../jquery.js"></script>
+    <script src="../main.js"></script>
+    
+    <script async src="../search-index.js"></script>
+</body>
+</html>

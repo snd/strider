@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `strider` crate.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, strider">
+
+    <title>strider - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../main.css">
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'></p><script>window.sidebarCurrent = {name: 'strider', ty: 'mod', relpath: '../'};</script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content mod">
+<h1 class='fqn'><span class='in-band'>Crate <a class='mod' href=''>strider</a></span><span class='out-of-band'><span id='render-detail'>
+            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                [<span class='inner'>&#x2212;</span>]
+            </a>
+        </span><a id='src-0' class='srclink' href='../src/strider/lib.rs.html#1-520' title='goto source code'>[src]</a></span></h1>
+<div class='docblock'><p><strong><a href="trait.SliceRing.html">ringbuffer operations on multiple values at once</a>
+with an
+<a href="#performance">efficient implementation</a></strong></p>
+
+<p>useful for moving a window with variable step
+through a possibly infinite
+stream of values
+<a href="#memory">while avoiding
+unnecessary memory allocations</a></p>
+
+<p>handy when computing the <a href="https://en.wikipedia.org/wiki/Short-time_Fourier_transform">short-time fourier transform</a>.</p>
+
+<p>to use add <code>strider = &quot;*&quot;</code>
+to the <code>[dependencies]</code> section of your <code>Cargo.toml</code> and call <code>extern crate strider;</code> in your code.</p>
+
+<h2 id='example' class='section-header'><a href='#example'>example</a></h2>
+<p>the following program reads a stream of chars from stdin.
+it moves a window of size 4 (<code>WINDOW_SIZE</code>)
+through that stream in steps of 2 (<code>STEP_SIZE</code>).
+it writes the contents of every window to stdout.
+for the input of <code>ABCDEFGHIJK</code> it produces the output <code>ABCDCDEFEFGHGHIJ</code>.
+it uses constant memory and does <strong>no</strong> allocations after the initial ones.
+you should be able to adapt it to your needs.</p>
+<pre class='rust rust-example-rendered'>
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>;
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>::{<span class='ident'>Write</span>, <span class='ident'>Read</span>};
+
+<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>strider</span>;
+<span class='kw'>use</span> <span class='ident'>strider</span>::{<span class='ident'>SliceRing</span>, <span class='ident'>SliceRingImpl</span>};
+
+<span class='kw'>fn</span> <span class='ident'>main</span>() {
+    <span class='kw'>const</span> <span class='ident'>WINDOW_SIZE</span>: <span class='ident'>usize</span> <span class='op'>=</span> <span class='number'>4</span>;
+    <span class='kw'>const</span> <span class='ident'>STEP_SIZE</span>: <span class='ident'>usize</span> <span class='op'>=</span> <span class='number'>2</span>;
+
+    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>ring</span> <span class='op'>=</span> <span class='ident'>SliceRingImpl</span>::<span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>::<span class='ident'>new</span>();
+    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>input_buffer</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='ident'>u8</span>] <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='number'>0</span>; <span class='number'>20</span>];
+    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>window_buffer</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='ident'>u8</span>] <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='number'>0</span>; <span class='ident'>WINDOW_SIZE</span>];
+
+    <span class='kw'>loop</span> {
+        <span class='kw'>let</span> <span class='ident'>input_count</span> <span class='op'>=</span> <span class='ident'>io</span>::<span class='ident'>stdin</span>().<span class='ident'>read</span>(<span class='ident'>input_buffer</span>).<span class='ident'>unwrap</span>();
+        <span class='comment'>// leave the loop when we reach end of file</span>
+        <span class='kw'>if</span> <span class='ident'>input_count</span> <span class='op'>==</span> <span class='number'>0</span> { <span class='kw'>break</span>; }
+
+        <span class='comment'>// add elements to the back of the ring</span>
+        <span class='ident'>ring</span>.<span class='ident'>push_many_back</span>(<span class='kw-2'>&amp;</span><span class='ident'>input_buffer</span>[..<span class='ident'>input_count</span>]);
+        <span class='comment'>// read as long as we can read windows of length `WINDOW_SIZE`</span>
+        <span class='kw'>while</span> <span class='ident'>WINDOW_SIZE</span> <span class='op'>&lt;=</span> <span class='ident'>ring</span>.<span class='ident'>len</span>() {
+            <span class='ident'>ring</span>.<span class='ident'>read_many_front</span>(<span class='ident'>window_buffer</span>);
+            <span class='ident'>io</span>::<span class='ident'>stdout</span>().<span class='ident'>write</span>(<span class='ident'>window_buffer</span>).<span class='ident'>unwrap</span>();
+            <span class='comment'>// do a step by dropping the first `STEP_SIZE` elements in ring</span>
+            <span class='ident'>ring</span>.<span class='ident'>drop_many_front</span>(<span class='ident'>STEP_SIZE</span>);
+        }
+    }
+}</pre>
+
+<h2 id='performance' class='section-header'><a href='#performance'>performance</a></h2>
+<p>the trait <a href="trait.SliceRing.html">strider::SliceRing</a> is implemented for
+<a href="https://doc.rust-lang.org/stable/std/collections/struct.VecDeque.html">std::collections::VecDeque</a>
+and <a href="struct.SliceRingImpl.html">strider::SliceRingImpl</a>.</p>
+
+<p><a href="struct.SliceRingImpl.html">strider::SliceRingImpl</a> is
+limited to the functionality in
+<a href="trait.SliceRing.html">strider::SliceRing</a>
+but optimized for it and <a href="https://travis-ci.org/snd/strider/jobs/99508425#L192"><strong>2 to 6 times faster</strong></a>
+than the implementation
+for <a href="https://doc.rust-lang.org/stable/std/collections/struct.VecDeque.html">std::collections::VecDeque</a>.</p>
+
+<p>see the benchmark <a href="https://travis-ci.org/snd/strider/jobs/99508425#L192">results</a>
+and <a href="https://github.com/snd/strider/blob/master/benches/lib.rs">implementation</a>.</p>
+
+<p>windowing the equivalent of 1 minute of 44100 hz audio samples
+with a window_size of 1024 and step_size of 512
+<a href="https://travis-ci.org/snd/strider/jobs/99508425#L207">only takes around 5 milliseconds</a>.</p>
+
+<h2 id='memory' class='section-header'><a href='#memory'>memory</a></h2>
+<p>the following holds true for both implementations:</p>
+
+<p><a href="trait.SliceRing.html#tymethod.read_many_front">strider::SliceRing::read_many_front</a>
+never allocates memory. it writes into a buffer that you
+allocate and control.</p>
+
+<p><a href="trait.SliceRing.html#tymethod.read_many_drop">strider::SliceRing::drop_many_front</a>
+never allocates memory.</p>
+
+<p><a href="trait.SliceRing.html#tymethod.push_many_back">strider::SliceRing::push_many_back</a>
+reads from a buffer that you
+allocate and control.
+it might allocate more capacity
+when you push values and as a result there are more values in the ring than ever before.
+if you repeatedly read and drop after each push, as in the <a href="#example">example</a> above,
+the number of values will stay below a certain value and it will never
+allocate memory after an initial 1 or 2 allocations.</p>
+</div><h2 id='macros' class='section-header'><a href="#macros">Macros</a></h2>
+<table>
+                    <tr class=' module-item'>
+                        <td><a class='macro' href='macro.test_slice_ring!.html'
+                               title='strider::test_slice_ring!'>test_slice_ring!</a></td>
+                        <td class='docblock short'>
+                             <p>macro containing a test run that is used to test and benchmark
+different implementations of the <code>SliceRing</code> trait</p>
+
+                        </td>
+                    </tr>
+                </table><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+<table>
+                    <tr class=' module-item'>
+                        <td><a class='struct' href='struct.SliceRingImpl.html'
+                               title='strider::SliceRingImpl'>SliceRingImpl</a></td>
+                        <td class='docblock short'>
+                             <p>readable area starts at <code>first_readable</code> and goes until
+<code>next_writable</code>.
+<code>next_writable</code> is one after the last readable and not readable.</p>
+
+                        </td>
+                    </tr>
+                </table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
+<table>
+                    <tr class=' module-item'>
+                        <td><a class='trait' href='trait.SliceRing.html'
+                               title='strider::SliceRing'>SliceRing</a></td>
+                        <td class='docblock short'>
+                             <p>ringbuffer operations on slices</p>
+
+                        </td>
+                    </tr>
+                </table></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../";
+        window.currentCrate = "strider";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../jquery.js"></script>
+    <script src="../main.js"></script>
+    
+    <script async src="../search-index.js"></script>
+</body>
+</html>
