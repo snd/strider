@@ -25,4 +25,4 @@ to the `[dependencies]` section of your `Cargo.toml` and call `extern crate stri
 
 ### [contributing](contributing.md)
 
-### licensed under either of [Apache-2.0](LICENSE-APACHE) or [MIT](LICENSE-MIT) at your option
+### licensed under either of [apache-2.0](LICENSE-APACHE) or [MIT](LICENSE-MIT) at your option
