@@ -1,5 +1,7 @@
 # strider
 
+*status: working. tested. api still in flux.*
+
 [![Build Status](https://travis-ci.org/snd/strider.svg?branch=master)](https://travis-ci.org/snd/strider/branches)
 [![](https://meritbadge.herokuapp.com/strider)](https://crates.io/crates/strider)
 
